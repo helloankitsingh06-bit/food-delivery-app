@@ -1,0 +1,183 @@
+/* 🌍 Background */
+.register-container {
+  height: 100vh;
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ✨ Glow Effects */
+.register-container::before,
+.register-container::after {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,215,0,0.2), transparent);
+}
+
+.register-container::before {
+  top: -100px;
+  left: -100px;
+}
+
+.register-container::after {
+  bottom: -100px;
+  right: -100px;
+}
+
+/* 🧊 Card */
+.register-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 30px;
+  width: 350px;
+  color: white;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* 🍽 Title */
+.app-title {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 5px;
+}
+
+.app-title span {
+  color: gold;
+}
+
+.tagline {
+  text-align: center;
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 20px;
+}
+
+.register-heading {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 🧾 Inputs */
+.form-control {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+/* 🔽 Dropdown Fix */
+select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  cursor: pointer;
+}
+
+/* 🔽 Dropdown Options */
+select.form-control option {
+  background: #1a1a1a;  /* dark background */
+  color: white;         /* visible text */
+}
+
+/* Fix for some browsers */
+select.form-control:focus option:checked {
+  background: #FFD700;
+  color: black;
+}
+
+.form-control::placeholder {
+  color: #ccc;
+}
+
+.form-control:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(255,215,0,0.6);
+}
+
+/* 🟡 Button */
+.btn-register {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FFD700, #FFB300);
+  color: black;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-register:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255,215,0,0.7);
+}
+
+/* ➖ Divider */
+.divider {
+  text-align: center;
+  margin: 15px 0;
+  color: #aaa;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  width: 40%;
+  background: #444;
+  position: absolute;
+  top: 50%;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+/* 🔗 Login */
+.login-link {
+  text-align: center;
+}
+
+.login-link a {
+  color: gold;
+  text-decoration: none;
+}
+
+/* ❌ Error */
+.alert-error {
+  background: #2a0000;
+  color: #ff4d4d;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* 🎬 Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

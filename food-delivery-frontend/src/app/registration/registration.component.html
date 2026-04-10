@@ -1,0 +1,100 @@
+<div class="register-container">
+
+  <!-- Card -->
+  <div class="register-card">
+
+    <!-- Title -->
+    <h1 class="app-title">🍽 Food<span>Royal</span></h1>
+    <p class="tagline">Create your premium account</p>
+
+    <h2 class="register-heading">Sign Up</h2>
+
+    <!-- Form -->
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+
+      <!-- Username -->
+      <div class="form-group">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="userData.username"
+          required
+          class="form-control"
+          placeholder="👤 Choose a username">
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="userData.email"
+          required
+          class="form-control"
+          placeholder="📧 Enter your email">
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="userData.password"
+          required
+          class="form-control"
+          placeholder="🔒 Create a password">
+      </div>
+
+
+      <!-- Role -->
+      <div class="form-group">
+        <select
+          id="role"
+          name="role"
+          [(ngModel)]="userData.role"
+          required
+          class="form-control">
+
+          <option value="" disabled selected>Select Role</option>
+
+          <option *ngFor="let role of roles" [value]="role">
+            {{ role }}
+          </option>
+
+        </select>
+      </div>
+
+      <!-- Success -->
+      <div *ngIf="successMessage" class="alert-success">
+        {{ successMessage }}
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="errorMessage" class="alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Button -->
+      <button type="submit" class="btn-register" [disabled]="loading">
+        {{ loading ? 'Registering...' : 'Create Account →' }}
+      </button>
+
+    </form>
+
+    <!-- Divider -->
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <!-- Login Redirect -->
+    <div class="login-link">
+      <p>Already have an account?</p>
+      <a routerLink="/login">Login here</a>
+    </div>
+
+  </div>
+
+</div>

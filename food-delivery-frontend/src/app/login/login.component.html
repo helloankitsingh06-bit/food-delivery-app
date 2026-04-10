@@ -1,0 +1,75 @@
+<div class="login-container">
+
+  <!-- Background Overlay -->
+  <div class="login-overlay"></div>
+
+  <!-- Login Card -->
+  <div class="login-card">
+
+    <!-- Logo / Title -->
+    <h1 class="app-title">🍽 Food<span>Royal</span></h1>
+    <p class="tagline">Premium Food Delivery Experience</p>
+
+    <h2 class="login-heading">Welcome Back</h2>
+
+    <!-- Form -->
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+
+      <!-- Username -->
+      <div class="form-group">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="credentials.username"
+          required
+          class="form-control"
+          placeholder="👤 Username">
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="credentials.password"
+          required
+          class="form-control"
+          placeholder="🔒 Password">
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="errorMessage" class="alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Button -->
+      <button type="submit" class="btn-login" [disabled]="loading">
+        {{ loading ? 'Logging in...' : 'Login →' }}
+      </button>
+
+    </form>
+
+    <!-- Divider -->
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <!-- Register -->
+    <div class="register-link">
+      <p>New here?</p>
+      <a routerLink="/register">Create an account</a>
+    </div>
+
+    <!-- Demo -->
+    <div class="demo-box">
+      <h4>Demo Accounts</h4>
+      <p><strong>👤 Customer:</strong> customer1 / 12345</p>
+      <p><strong>🍽 Restaurant:</strong> restaurant1 / 12345</p>
+      <p><strong>🚚 Delivery:</strong> delivery1 / 12345</p>
+    </div>
+
+  </div>
+
+</div>
