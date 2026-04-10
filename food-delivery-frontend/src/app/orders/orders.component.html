@@ -1,0 +1,123 @@
+<div class="orders-container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Orders Dashboard</h1>
+    </div>
+
+    <div class="header-right">
+      <input type="text" placeholder="Search orders..." [(ngModel)]="searchTerm" (input)="filterOrders()">
+
+      <select [(ngModel)]="statusFilter" (change)="filterOrders()">
+        <option value="ALL">All Orders</option>
+        <option value="PLACED">Placed</option>
+        <option value="PREPARING">Preparing</option>
+        <option value="DELIVERED">Delivered</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading">
+    <p>Loading orders...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage">
+    <p style="color:red;">{{ errorMessage }}</p>
+  </div>
+
+  <!-- Orders -->
+  <div *ngIf="!loading">
+
+    <!-- Empty -->
+    <div *ngIf="filteredOrders.length === 0">
+      <h3>No orders found</h3>
+    </div>
+
+    <!-- Order Cards -->
+    <div *ngFor="let order of filteredOrders" class="order-card">
+
+      <div class="order-header">
+        <h3>Order #{{ order.id }}</h3>
+        <span>{{ order.status }}</span>
+      </div>
+
+      <p><strong>{{ order.restaurantName }}</strong></p>
+
+      <p><strong>Items:</strong> {{ order.items.join(', ') }}</p>
+
+      <p><strong>Total:</strong> ₹{{ order.totalPrice }}</p>
+
+      <p><strong>Date:</strong> {{ order.orderDate | date:'medium' }}</p>
+
+      <div *ngIf="order.deliveryAddress">
+        <p><strong>Address:</strong> {{ order.deliveryAddress }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+
+        <button (click)="trackOrder(order.id)">Track</button>
+
+        <button *ngIf="order.status === 'DELIVERED'" (click)="reorderItems(order.id)">
+          Reorder
+        </button>
+
+        <button *ngIf="order.status === 'DELIVERED'" (click)="rateOrder(order)">
+          Rate
+        </button>
+
+        <button *ngIf="canCancelOrder(order.status)" (click)="cancelOrder(order.id)">
+          Cancel
+        </button>
+
+        <button (click)="reportIssue(order.id)">
+          Report Issue
+        </button>
+
+      </div>
+
+      <hr>
+
+    </div>
+  </div>
+
+  <!-- Rating Modal -->
+  <div *ngIf="showRatingModal" class="modal">
+
+    <h2>Rate Order</h2>
+
+    <div>
+      <span *ngFor="let star of [1,2,3,4,5]" (click)="ratingValue = star">
+        ⭐
+      </span>
+    </div>
+
+    <textarea [(ngModel)]="ratingFeedback"></textarea>
+
+    <button (click)="submitRating()">Submit</button>
+    <button (click)="closeRatingModal()">Close</button>
+
+  </div>
+
+  <!-- Issue Modal -->
+  <div *ngIf="showIssueModal" class="modal">
+
+    <h2>Report Issue</h2>
+
+    <select [(ngModel)]="issueType">
+      <option value="">Select Issue</option>
+      <option value="WRONG_ORDER">Wrong Order</option>
+      <option value="DELIVERY">Delivery Issue</option>
+    </select>
+
+    <textarea [(ngModel)]="issueDescription"></textarea>
+
+    <button (click)="submitIssue()">Submit</button>
+    <button (click)="closeIssueModal()">Close</button>
+
+  </div>
+
+</div>
