@@ -46,4 +46,8 @@ public class Order {
         OUT_FOR_DELIVERY,
         DELIVERED
     }
+    public void setStatus(Status status) 
+    {
+        this.status = status;
+    }
 }

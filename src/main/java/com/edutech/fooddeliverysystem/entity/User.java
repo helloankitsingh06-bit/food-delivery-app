@@ -37,4 +37,8 @@ public class User {
         RESTAURANT,
         DELIVERY
     }
+    public String getPassword() 
+    {
+        return password;
+    }
 }

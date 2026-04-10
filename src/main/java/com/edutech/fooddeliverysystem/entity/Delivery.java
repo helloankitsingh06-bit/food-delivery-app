@@ -36,4 +36,8 @@ public class Delivery {
         PICKED,
         DELIVERED
     }
+    public void setStatus(DeliveryStatus status) 
+    {
+        this.status = status;
+    }
 }
