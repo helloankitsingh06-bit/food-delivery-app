@@ -75,6 +75,20 @@
     		<artifactId>jjwt</artifactId>
     		<version>0.9.1</version>
 		</dependency>
+<<<<<<< HEAD
+=======
+		<dependency>
+    		<groupId>javax.xml.bind</groupId>
+    		<artifactId>jaxb-api</artifactId>
+    		<version>2.3.1</version>
+		</dependency>
+
+		<dependency>
+    		<groupId>org.glassfish.jaxb</groupId>
+    		<artifactId>jaxb-runtime</artifactId>
+    		<version>2.3.1</version>
+		</dependency>
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
 	</dependencies>
 
 <build>

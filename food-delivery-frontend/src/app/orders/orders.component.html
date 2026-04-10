@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="orders-container">
 
   <!-- Header -->
@@ -121,3 +122,656 @@
   </div>
 
 </div>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodDash - Orders Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* PASTE THE COMPLETE CSS CODE HERE */
+  </style>
+</head>
+<body>
+  <div class="orders-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <button class="menu-toggle" (click)="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1>
+          <span *ngIf="userRole === 'CUSTOMER'">My Orders</span>
+          <span *ngIf="userRole === 'RESTAURANT'">Restaurant Orders</span>
+          <span *ngIf="userRole === 'DELIVERY'">Delivery Assignments</span>
+        </h1>
+      </div>
+      <div class="header-right">
+        <!-- Search Bar -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search orders..." [(ngModel)]="searchTerm" (input)="filterOrders()">
+        </div>
+
+        <!-- Filter Dropdown -->
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="filterOrders()">
+          <option value="ALL">All Orders</option>
+          <option value="PLACED">Placed</option>
+          <option value="PREPARING">Preparing</option>
+          <option value="READY">Ready</option>
+          <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+          <option value="DELIVERED">Delivered</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+
+        <!-- Date Filter -->
+        <select class="filter-select" [(ngModel)]="dateFilter" (change)="filterOrders()">
+          <option value="ALL">All Time</option>
+          <option value="TODAY">Today</option>
+          <option value="WEEK">This Week</option>
+          <option value="MONTH">This Month</option>
+        </select>
+
+        <!-- Notification Bell -->
+        <div class="notification-bell" (click)="toggleNotifications()">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+
+          <!-- Notifications Dropdown -->
+          <div class="notifications-dropdown" *ngIf="showNotifications">
+            <h4>Notifications</h4>
+            <div class="notification-item" *ngFor="let notif of notifications">
+              <i class="fas" [class.fa-check-circle]="notif.type === 'success'" [class.fa-clock]="notif.type === 'update'"></i>
+              <div class="notification-content">
+                <p>{{ notif.message }}</p>
+                <span class="notification-time">{{ notif.time | date:'shortTime' }}</span>
+              </div>
+            </div>
+            <button class="mark-read" (click)="markAllRead()">Mark all as read</button>
+          </div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="user-profile" (click)="toggleProfileMenu()">
+          <img [src]="userAvatar || 'assets/default-avatar.png'" alt="Profile">
+          <span>{{ userName }}</span>
+          <i class="fas fa-chevron-down"></i>
+
+          <!-- Profile Dropdown -->
+          <div class="profile-dropdown" *ngIf="showProfileMenu">
+            <a routerLink="/profile"><i class="fas fa-user"></i> My Profile</a>
+            <a routerLink="/settings"><i class="fas fa-cog"></i> Settings</a>
+            <a routerLink="/payment"><i class="fas fa-credit-card"></i> Payment Methods</a>
+            <hr>
+            <button (click)="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-container">
+      <div class="stat-card" *ngIf="userRole === 'CUSTOMER'">
+        <div class="stat-icon">
+          <i class="fas fa-shopping-bag"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalOrders }}</h3>
+          <p>Total Orders</p>
+        </div>
+      </div>
+
+      <div class="stat-card" *ngIf="userRole === 'CUSTOMER'">
+        <div class="stat-icon">
+          <i class="fas fa-truck"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ activeOrders }}</h3>
+          <p>Active Orders</p>
+        </div>
+      </div>
+
+      <div class="stat-card" *ngIf="userRole === 'CUSTOMER'">
+        <div class="stat-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ savedAddresses?.length || 0 }}</h3>
+          <p>Saved Addresses</p>
+        </div>
+      </div>
+
+      <div class="stat-card" *ngIf="userRole === 'RESTAURANT'">
+        <div class="stat-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-info">
+          <h3>₹{{ todayRevenue }}</h3>
+          <p>Today's Revenue</p>
+        </div>
+      </div>
+
+      <div class="stat-card" *ngIf="userRole === 'RESTAURANT'">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ pendingOrders }}</h3>
+          <p>Pending Orders</p>
+        </div>
+      </div>
+
+      <div class="stat-card" *ngIf="userRole === 'DELIVERY'">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ completedDeliveries }}</h3>
+          <p>Completed Today</p>
+        </div>
+      </div>
+
+      <div class="stat-card" *ngIf="userRole === 'DELIVERY'">
+        <div class="stat-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-info">
+          <h3>₹{{ todayEarnings }}</h3>
+          <p>Today's Earnings</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Bar -->
+    <div class="quick-actions">
+      <button class="action-btn" *ngIf="userRole === 'CUSTOMER'" (click)="navigateToRestaurants()">
+        <i class="fas fa-utensils"></i> Order Again
+      </button>
+      <button class="action-btn" *ngIf="userRole === 'CUSTOMER'" (click)="openSupportChat()">
+        <i class="fas fa-headset"></i> Customer Support
+      </button>
+      <button class="action-btn" *ngIf="userRole === 'RESTAURANT'" (click)="openMenuManager()">
+        <i class="fas fa-edit"></i> Manage Menu
+      </button>
+      <button class="action-btn" *ngIf="userRole === 'RESTAURANT'" (click)="viewAnalytics()">
+        <i class="fas fa-chart-bar"></i> Analytics
+      </button>
+      <button class="action-btn" *ngIf="userRole === 'DELIVERY'" (click)="toggleOnlineStatus()">
+        <i class="fas" [class.fa-toggle-on]="isOnline" [class.fa-toggle-off]="!isOnline"></i>
+        {{ isOnline ? 'Online' : 'Offline' }}
+      </button>
+      <button class="action-btn" *ngIf="userRole === 'DELIVERY'" (click)="viewRouteMap()">
+        <i class="fas fa-map-marked-alt"></i> Route Map
+      </button>
+    </div>
+
+    <!-- Loading & Error -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading orders...</p>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+
+    <!-- Tabs for Order Categories -->
+    <div class="order-tabs" *ngIf="!loading">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'active'"
+        (click)="activeTab = 'active'">
+        Active Orders
+        <span class="tab-count">{{ activeOrdersCount }}</span>
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'past'"
+        (click)="activeTab = 'past'">
+        Past Orders
+        <span class="tab-count">{{ pastOrdersCount }}</span>
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'cancelled'"
+        (click)="activeTab = 'cancelled'"
+        *ngIf="userRole !== 'DELIVERY'">
+        Cancelled
+        <span class="tab-count">{{ cancelledOrdersCount }}</span>
+      </button>
+    </div>
+
+    <!-- Orders List -->
+    <div class="orders-list" *ngIf="!loading">
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredOrders?.length === 0">
+        <i class="fas fa-inbox"></i>
+        <h3>No orders found</h3>
+        <p *ngIf="userRole === 'CUSTOMER'">Start ordering delicious food from your favorite restaurants!</p>
+        <p *ngIf="userRole === 'RESTAURANT'">No orders received yet. Share your restaurant link to get started!</p>
+        <p *ngIf="userRole === 'DELIVERY'">No delivery assignments at the moment.</p>
+        <button class="btn-primary" *ngIf="userRole === 'CUSTOMER'" (click)="navigateToRestaurants()">
+          Browse Restaurants
+        </button>
+      </div>
+
+      <div *ngFor="let order of filteredOrders" class="order-card" [class.cancelled]="order.status === 'CANCELLED'">
+        <!-- Favorite Button -->
+        <button class="favorite-btn" *ngIf="userRole === 'CUSTOMER'" (click)="toggleFavorite(order.restaurantId)">
+          <i class="fas" [class.fa-heart]="order.isFavorite" [class.fa-heart-o]="!order.isFavorite"></i>
+        </button>
+
+        <!-- Order Header -->
+        <div class="order-header">
+          <div class="order-title">
+            <h3>Order #{{ order.id }}</h3>
+            <span class="order-type" *ngIf="order.orderType">
+              <i class="fas" [class.fa-store]="order.orderType === 'PICKUP'" [class.fa-motorcycle]="order.orderType === 'DELIVERY'"></i>
+              {{ order.orderType }}
+            </span>
+          </div>
+          <span class="status-badge" [style.backgroundColor]="getStatusColor(order.status)">
+            {{ order.status }}
+          </span>
+        </div>
+
+        <!-- Restaurant Info -->
+        <div class="restaurant-info">
+          <img [src]="order.restaurantImage || 'assets/restaurant-placeholder.png'" alt="Restaurant" class="restaurant-img">
+          <div class="restaurant-details">
+            <p class="restaurant-name">{{ order.restaurantName }}</p>
+            <div class="restaurant-rating">
+              <i class="fas fa-star"></i>
+              <span>{{ order.restaurantRating || '4.5' }}</span>
+              <span class="rating-count">({{ order.ratingCount || '100+' }} ratings)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Details -->
+        <div class="order-details">
+          <div class="detail-row">
+            <i class="fas fa-utensils"></i>
+            <p><strong>Items:</strong> {{ order.items?.join(', ') }}</p>
+          </div>
+          <div class="detail-row">
+            <i class="fas fa-rupee-sign"></i>
+            <p><strong>Total Amount:</strong> ₹{{ order.totalPrice }}</p>
+            <span class="payment-method" *ngIf="order.paymentMethod">
+              • {{ order.paymentMethod }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <i class="fas fa-calendar"></i>
+            <p><strong>Ordered At:</strong> {{ order.orderDate | date:'medium' }}</p>
+          </div>
+          <div class="detail-row" *ngIf="order.deliveryAddress">
+            <i class="fas fa-map-pin"></i>
+            <p><strong>Delivery Address:</strong> {{ order.deliveryAddress }}</p>
+          </div>
+          <div class="detail-row" *ngIf="order.estimatedDeliveryTime">
+            <i class="fas fa-clock"></i>
+            <p><strong>Estimated Delivery:</strong> {{ order.estimatedDeliveryTime }}</p>
+          </div>
+
+          <!-- Delivery Partner Info -->
+          <div class="delivery-partner" *ngIf="order.deliveryPartner && userRole === 'CUSTOMER'">
+            <img [src]="order.deliveryPartner.avatar" alt="Delivery Partner">
+            <div class="partner-info">
+              <p class="partner-name">{{ order.deliveryPartner.name }}</p>
+              <p class="partner-vehicle">{{ order.deliveryPartner.vehicle }}</p>
+            </div>
+            <button class="contact-partner" (click)="contactDeliveryPartner(order.deliveryPartner.id)">
+              <i class="fas fa-phone"></i>
+            </button>
+            <button class="track-partner" (click)="trackLiveLocation(order.id)">
+              <i class="fas fa-map-marker-alt"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Order Actions -->
+        <div class="order-actions">
+          <!-- CUSTOMER Actions -->
+          <ng-container *ngIf="userRole === 'CUSTOMER'">
+            <button class="btn-track" (click)="trackOrder(order.id)">
+              <i class="fas fa-map-marked-alt"></i> Track Order
+            </button>
+            <button *ngIf="order.status === 'DELIVERED'" class="btn-reorder" (click)="reorderItems(order.id)">
+              <i class="fas fa-redo-alt"></i> Reorder
+            </button>
+            <button *ngIf="order.status === 'DELIVERED'" class="btn-rate" (click)="rateOrder(order)">
+              <i class="fas fa-star"></i> Rate Order
+            </button>
+            <button *ngIf="order.status === 'DELIVERED'" class="btn-help" (click)="reportIssue(order.id)">
+              <i class="fas fa-question-circle"></i> Help
+            </button>
+            <button *ngIf="canCancelOrder(order.status)" class="btn-cancel" (click)="cancelOrder(order.id)">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            <button *ngIf="order.status === 'DELIVERED'" class="btn-receipt" (click)="downloadReceipt(order.id)">
+              <i class="fas fa-download"></i> Receipt
+            </button>
+          </ng-container>
+
+          <!-- RESTAURANT Actions -->
+          <ng-container *ngIf="userRole === 'RESTAURANT'">
+            <select #statusSelect (change)="updateOrderStatus(order.id, statusSelect.value)" [value]="order.status">
+              <option *ngFor="let status of orderStatuses" [value]="status">
+                {{ status }}
+              </option>
+            </select>
+            <button class="btn-view-details" (click)="viewOrderDetails(order.id)">
+              <i class="fas fa-eye"></i> Details
+            </button>
+            <button class="btn-print" (click)="printOrderTicket(order.id)">
+              <i class="fas fa-print"></i> Print
+            </button>
+            <button *ngIf="order.status === 'PLACED'" class="btn-prep-time" (click)="setPreparationTime(order.id)">
+              <i class="fas fa-clock"></i> Set Prep Time
+            </button>
+            <button *ngIf="order.status === 'PLACED' || order.status === 'PREPARING'" class="btn-contact-customer" (click)="contactCustomer(order.customerId)">
+              <i class="fas fa-phone"></i> Contact Customer
+            </button>
+          </ng-container>
+
+          <!-- DELIVERY Actions -->
+          <ng-container *ngIf="userRole === 'DELIVERY'">
+            <button *ngIf="order.status === 'READY'" class="btn-pickup"
+                    (click)="updateDeliveryStatus(order.id, 'OUT_FOR_DELIVERY')">
+              <i class="fas fa-box"></i> Pick Up for Delivery
+            </button>
+            <button *ngIf="order.status === 'OUT_FOR_DELIVERY'" class="btn-deliver"
+                    (click)="updateDeliveryStatus(order.id, 'DELIVERED')">
+              <i class="fas fa-check-circle"></i> Mark as Delivered
+            </button>
+            <button class="btn-navigate" (click)="navigateToAddress(order.deliveryAddress)">
+              <i class="fas fa-directions"></i> Navigate
+            </button>
+            <button class="btn-call-customer" (click)="callCustomer(order.customerPhone)">
+              <i class="fas fa-phone-alt"></i> Call Customer
+            </button>
+            <button *ngIf="order.status === 'OUT_FOR_DELIVERY'" class="btn-issue" (click)="reportDeliveryIssue(order.id)">
+              <i class="fas fa-exclamation-triangle"></i> Report Issue
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div class="modal" [class.show]="selectedOrder" (click)="closeTracking()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <span class="close" (click)="closeTracking()">&times;</span>
+        <h2>Track Order #{{ selectedOrder?.id }}</h2>
+
+        <div class="tracking-status">
+          <div class="tracking-step" [class.completed]="true">
+            <div class="step-icon">✓</div>
+            <div class="step-label">Order Placed</div>
+          </div>
+          <div class="tracking-step" [class.completed]="selectedOrder?.status !== 'PLACED'">
+            <div class="step-icon">{{ selectedOrder?.status !== 'PLACED' ? '✓' : '○' }}</div>
+            <div class="step-label">Preparing</div>
+          </div>
+          <div class="tracking-step" [class.completed]="['READY','OUT_FOR_DELIVERY','DELIVERED'].includes(selectedOrder?.status)">
+            <div class="step-icon">{{ ['READY','OUT_FOR_DELIVERY','DELIVERED'].includes(selectedOrder?.status) ? '✓' : '○' }}</div>
+            <div class="step-label">Ready</div>
+          </div>
+          <div class="tracking-step" [class.completed]="['OUT_FOR_DELIVERY','DELIVERED'].includes(selectedOrder?.status)">
+            <div class="step-icon">{{ ['OUT_FOR_DELIVERY','DELIVERED'].includes(selectedOrder?.status) ? '✓' : '○' }}</div>
+            <div class="step-label">Out for Delivery</div>
+          </div>
+          <div class="tracking-step" [class.completed]="selectedOrder?.status === 'DELIVERED'">
+            <div class="step-icon">{{ selectedOrder?.status === 'DELIVERED' ? '✓' : '○' }}</div>
+            <div class="step-label">Delivered</div>
+          </div>
+        </div>
+
+        <p class="estimated-time">Estimated Delivery: {{ getEstimatedDeliveryTime() }}</p>
+
+        <!-- Live Tracking Map Placeholder -->
+        <div class="tracking-map" *ngIf="selectedOrder?.status === 'OUT_FOR_DELIVERY'">
+          <i class="fas fa-map"></i>
+          <span>Live tracking map would appear here</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div class="modal rating-modal" [class.show]="showRatingModal" (click)="closeRatingModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <span class="close" (click)="closeRatingModal()">&times;</span>
+        <h2>Rate Your Order</h2>
+
+        <div class="rating-stars">
+          <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]; let i = index"
+             [class.active]="ratingValue > i"
+             (click)="ratingValue = i + 1"
+             (mouseenter)="hoverRating = i + 1"
+             (mouseleave)="hoverRating = 0">
+          </i>
+        </div>
+
+        <textarea class="rating-feedback" placeholder="Tell us about your experience... (Optional)"
+                  [(ngModel)]="ratingFeedback"></textarea>
+
+        <button class="submit-rating" (click)="submitRating()">Submit Rating</button>
+      </div>
+    </div>
+
+    <!-- Help/Issue Modal -->
+    <div class="modal" [class.show]="showHelpModal" (click)="closeHelpModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <span class="close" (click)="closeHelpModal()">&times;</span>
+        <h2>Report an Issue</h2>
+
+        <select class="filter-select issue-type" [(ngModel)]="issueType">
+          <option value="">Select Issue Type</option>
+          <option value="WRONG_ORDER">Wrong Order</option>
+          <option value="MISSING_ITEMS">Missing Items</option>
+          <option value="QUALITY">Quality Issue</option>
+          <option value="DELIVERY">Delivery Issue</option>
+          <option value="OTHER">Other</option>
+        </select>
+
+        <textarea class="rating-feedback" placeholder="Describe your issue..."
+                  [(ngModel)]="issueDescription"></textarea>
+
+        <button class="submit-rating" (click)="submitIssue()">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock data and functions for preview
+    // This would be replaced by your actual Angular component logic
+    const mockData = {
+      userRole: 'CUSTOMER', // Try 'CUSTOMER', 'RESTAURANT', or 'DELIVERY'
+      userName: 'John Doe',
+      userAvatar: 'https://i.pravatar.cc/150?img=3',
+      notificationCount: 3,
+      showNotifications: false,
+      showProfileMenu: false,
+      totalOrders: 24,
+      activeOrders: 3,
+      activeOrdersCount: 3,
+      pastOrdersCount: 20,
+      cancelledOrdersCount: 1,
+      savedAddresses: ['Home', 'Work'],
+      todayRevenue: 12500,
+      pendingOrders: 5,
+      completedDeliveries: 8,
+      todayEarnings: 850,
+      isOnline: true,
+      loading: false,
+      errorMessage: '',
+      searchTerm: '',
+      statusFilter: 'ALL',
+      dateFilter: 'ALL',
+      activeTab: 'active',
+      showRatingModal: false,
+      showHelpModal: false,
+      ratingValue: 0,
+      hoverRating: 0,
+      ratingFeedback: '',
+      issueType: '',
+      issueDescription: '',
+      selectedOrder: null,
+      orderStatuses: ['PLACED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'],
+
+      notifications: [
+        { type: 'success', message: 'Your order #ORD-123 has been delivered!', time: new Date() },
+        { type: 'update', message: 'Restaurant is preparing your order #ORD-124', time: new Date() },
+        { type: 'update', message: 'Delivery partner assigned to order #ORD-122', time: new Date() }
+      ],
+
+      orders: [
+        {
+          id: 'ORD-12345',
+          restaurantId: 'REST-001',
+          restaurantName: 'Golden Dragon',
+          restaurantImage: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=100&h=100&fit=crop',
+          restaurantRating: '4.5',
+          ratingCount: '250+',
+          items: ['Kung Pao Chicken', 'Fried Rice', 'Spring Rolls'],
+          totalPrice: 1250,
+          orderDate: new Date(),
+          deliveryAddress: '123 Main Street, Andheri East, Mumbai',
+          estimatedDeliveryTime: '25-30 mins',
+          status: 'PREPARING',
+          orderType: 'DELIVERY',
+          paymentMethod: 'Online Payment',
+          isFavorite: true,
+          deliveryPartner: {
+            id: 'DP-001',
+            name: 'Rajesh Kumar',
+            avatar: 'https://i.pravatar.cc/150?img=7',
+            vehicle: 'Honda Activa • MH 02 AB 1234'
+          }
+        },
+        {
+          id: 'ORD-67890',
+          restaurantId: 'REST-002',
+          restaurantName: 'Pizza Palace',
+          restaurantImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=100&h=100&fit=crop',
+          restaurantRating: '4.2',
+          ratingCount: '180+',
+          items: ['Margherita Pizza', 'Garlic Bread', 'Coke'],
+          totalPrice: 850,
+          orderDate: new Date(Date.now() - 86400000),
+          deliveryAddress: '456 Park Avenue, Bandra West, Mumbai',
+          status: 'DELIVERED',
+          orderType: 'DELIVERY',
+          paymentMethod: 'Cash on Delivery',
+          isFavorite: false
+        },
+        {
+          id: 'ORD-24680',
+          restaurantId: 'REST-003',
+          restaurantName: 'Spice Garden',
+          restaurantImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100&h=100&fit=crop',
+          restaurantRating: '4.7',
+          ratingCount: '320+',
+          items: ['Butter Chicken', 'Naan', 'Jeera Rice', 'Gulab Jamun'],
+          totalPrice: 1650,
+          orderDate: new Date(),
+          deliveryAddress: '789 Linking Road, Juhu, Mumbai',
+          estimatedDeliveryTime: '35-40 mins',
+          status: 'OUT_FOR_DELIVERY',
+          orderType: 'DELIVERY',
+          paymentMethod: 'UPI Payment',
+          isFavorite: true,
+          deliveryPartner: {
+            id: 'DP-002',
+            name: 'Priya Sharma',
+            avatar: 'https://i.pravatar.cc/150?img=5',
+            vehicle: 'TVS Jupiter • MH 03 CD 5678'
+          }
+        }
+      ],
+
+      filteredOrders: [],
+
+      getStatusColor(status) {
+        const colors = {
+          'PLACED': '#f39c12',
+          'PREPARING': '#3498db',
+          'READY': '#2ecc71',
+          'OUT_FOR_DELIVERY': '#9b59b6',
+          'DELIVERED': '#27ae60',
+          'CANCELLED': '#e74c3c'
+        };
+        return colors[status] || '#95a5a6';
+      },
+
+      canCancelOrder(status) {
+        return ['PLACED', 'PREPARING'].includes(status);
+      },
+
+      getEstimatedDeliveryTime() {
+        return '15-20 minutes';
+      },
+
+      // Mock functions
+      toggleSidebar() { console.log('Toggle sidebar'); },
+      toggleNotifications() { this.showNotifications = !this.showNotifications; },
+      toggleProfileMenu() { this.showProfileMenu = !this.showProfileMenu; },
+      toggleOnlineStatus() { this.isOnline = !this.isOnline; },
+      filterOrders() {
+        this.filteredOrders = this.orders.filter(o => {
+          if (this.statusFilter !== 'ALL' && o.status !== this.statusFilter) return false;
+          if (this.activeTab === 'active' && ['DELIVERED', 'CANCELLED'].includes(o.status)) return false;
+          if (this.activeTab === 'past' && o.status !== 'DELIVERED') return false;
+          if (this.activeTab === 'cancelled' && o.status !== 'CANCELLED') return false;
+          return true;
+        });
+      },
+      trackOrder(id) {
+        this.selectedOrder = this.orders.find(o => o.id === id);
+        console.log('Track order:', id);
+      },
+      closeTracking() { this.selectedOrder = null; },
+      reorderItems(id) { console.log('Reorder:', id); },
+      rateOrder(order) {
+        this.selectedOrder = order;
+        this.showRatingModal = true;
+      },
+      closeRatingModal() { this.showRatingModal = false; },
+      submitRating() {
+        console.log('Rating submitted:', this.ratingValue, this.ratingFeedback);
+        this.closeRatingModal();
+      },
+      reportIssue(id) {
+        this.selectedOrder = this.orders.find(o => o.id === id);
+        this.showHelpModal = true;
+      },
+      closeHelpModal() { this.showHelpModal = false; },
+      submitIssue() {
+        console.log('Issue reported:', this.issueType, this.issueDescription);
+        this.closeHelpModal();
+      },
+      cancelOrder(id) { console.log('Cancel order:', id); },
+      downloadReceipt(id) { console.log('Download receipt:', id); },
+      toggleFavorite(restaurantId) {
+        const order = this.orders.find(o => o.restaurantId === restaurantId);
+        if (order) order.isFavorite = !order.isFavorite;
+      },
+      contactDeliveryPartner(id) { console.log('Contact partner:', id); },
+      trackLiveLocation(id) { console.log('Track location:', id); },
+      navigateToRestaurants() { console.log('Navigate to restaurants'); },
+      openSupportChat() { console.log('Open support chat'); },
+      markAllRead() { this.notifications = []; this.notificationCount = 0; },
+      logout() { console.log('Logout'); }
+    };
+
+    // Initialize
+    mockData.filteredOrders = mockData.orders;
+
+    // For demo purposes, attach to window
+    window.demo = mockData;
+  </script>
+</body>
+</html>
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675

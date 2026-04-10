@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
+<<<<<<< HEAD
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+=======
+import { HttpClient } from '@angular/common/http';
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
+<<<<<<< HEAD
 // ============================================
 // INTERFACES
 // ============================================
@@ -22,6 +27,8 @@ export interface User {
 // AUTH SERVICE
 // ============================================
 
+=======
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
 @Injectable({
   providedIn: 'root'
 })
@@ -29,6 +36,7 @@ export class AuthService {
   private apiUrl = 'http://localhost:8080/api';
   private tokenKey = 'jwt_token';
   private userKey = 'user_data';
+<<<<<<< HEAD
   private refreshTokenKey = 'refresh_token';
   private loggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
   private userRoleSubject = new BehaviorSubject<string>(this.getUserRole());
@@ -61,6 +69,13 @@ export class AuthService {
   // AUTHENTICATION METHODS (Your existing methods)
   // ============================================
   
+=======
+  private loggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private userRoleSubject = new BehaviorSubject<string>(this.getUserRole());
+
+  constructor(private http: HttpClient, private router: Router) {}
+
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/register`, userData);
   }
@@ -78,12 +93,15 @@ export class AuthService {
   private setSession(authResult: any): void {
     localStorage.setItem(this.tokenKey, authResult.token);
     localStorage.setItem(this.userKey, JSON.stringify(authResult.user));
+<<<<<<< HEAD
     
     if (authResult.refreshToken) {
       localStorage.setItem(this.refreshTokenKey, authResult.refreshToken);
     }
     
     this.currentUser = authResult.user;
+=======
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
     this.loggedInSubject.next(true);
     this.userRoleSubject.next(authResult.user.role);
   }
@@ -91,22 +109,29 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+<<<<<<< HEAD
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem('favorites');
     this.currentUser = null;
+=======
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
     this.loggedInSubject.next(false);
     this.userRoleSubject.next('');
     this.router.navigate(['/login']);
   }
 
+<<<<<<< HEAD
   // ============================================
   // TOKEN METHODS
   // ============================================
   
+=======
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
+<<<<<<< HEAD
   getRefreshToken(): string | null {
     return localStorage.getItem(this.refreshTokenKey);
   }
@@ -124,10 +149,16 @@ export class AuthService {
       this.loadUserFromStorage();
     }
     return this.currentUser;
+=======
+  getUser(): any {
+    const user = localStorage.getItem(this.userKey);
+    return user ? JSON.parse(user) : null;
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   }
 
   getUserRole(): string {
     const user = this.getUser();
+<<<<<<< HEAD
     return user?.role || 'CUSTOMER';
   }
 
@@ -155,12 +186,22 @@ export class AuthService {
   // AUTH STATE OBSERVABLES
   // ============================================
   
+=======
+    return user ? user.role : '';
+  }
+
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   isLoggedIn(): boolean {
     return this.hasToken();
   }
 
+<<<<<<< HEAD
   isAuthenticated(): boolean {
     return this.hasToken();
+=======
+  private hasToken(): boolean {
+    return !!localStorage.getItem(this.tokenKey);
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   }
 
   getLoggedInStatus(): Observable<boolean> {
@@ -170,6 +211,7 @@ export class AuthService {
   getUserRoleObservable(): Observable<string> {
     return this.userRoleSubject.asObservable();
   }
+<<<<<<< HEAD
 
   // ============================================
   // ROLE CHECK METHODS
@@ -311,3 +353,6 @@ export class AuthService {
 }
 
 // Import HttpHeaders at the top if not already there
+=======
+}
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675

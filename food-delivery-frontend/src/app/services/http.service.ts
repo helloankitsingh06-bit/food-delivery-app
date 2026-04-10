@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+<<<<<<< HEAD
 // ============================================
 // INTERFACES
 // ============================================
@@ -59,6 +60,8 @@ interface DeliveryStats {
   todayEarnings: number;
 }
 
+=======
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
 @Injectable({
   providedIn: 'root'
 })
@@ -67,6 +70,7 @@ export class HttpService {
 
   constructor(private http: HttpClient) {}
 
+<<<<<<< HEAD
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
@@ -79,6 +83,9 @@ export class HttpService {
   // AUTH ENDPOINTS (Your existing methods)
   // ============================================
   
+=======
+  // Auth endpoints
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/register`, userData);
   }
@@ -87,10 +94,14 @@ export class HttpService {
     return this.http.post(`${this.apiUrl}/auth/login`, credentials);
   }
 
+<<<<<<< HEAD
   // ============================================
   // RESTAURANT ENDPOINTS (Your existing methods)
   // ============================================
   
+=======
+  // Restaurant endpoints
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   getAllRestaurants(): Observable<any> {
     return this.http.get(`${this.apiUrl}/restaurants`);
   }
@@ -99,18 +110,26 @@ export class HttpService {
     return this.http.get(`${this.apiUrl}/restaurants/${restaurantId}/menu`);
   }
 
+<<<<<<< HEAD
+=======
+  // ADD THIS METHOD - For adding menu items
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   addMenuItem(restaurantId: number, menuItem: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/restaurant/menu?restaurantId=${restaurantId}`, menuItem);
   }
 
+<<<<<<< HEAD
   // ============================================
   // ORDER ENDPOINTS (Your existing methods)
   // ============================================
   
+=======
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
   placeOrder(restaurantId: number, orderData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/customer/order?restaurantId=${restaurantId}`, orderData);
   }
 
+<<<<<<< HEAD
   // ===== ENHANCED ORDERS =====
   getCustomerOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(`${this.apiUrl}/customer/orders`, { headers: this.getHeaders() });
@@ -274,3 +293,29 @@ export class HttpService {
     return this.http.get<Order>(`${this.apiUrl}/orders/${orderId}`, { headers: this.getHeaders() });
   }
 }
+=======
+  getCustomerOrders(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/customer/orders`);
+  }
+
+  getRestaurantOrders(restaurantId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/restaurant/orders/${restaurantId}`);
+  }
+
+  updateOrderStatus(orderId: number, status: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/restaurant/order/update/${orderId}?status=${status}`, {});
+  }
+
+  updateDeliveryStatus(orderId: number, status: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/delivery/update/${orderId}?status=${status}`, {});
+  }
+
+  getDeliveryOrders(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/delivery/orders`);
+  }
+
+  trackOrder(orderId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/orders/${orderId}/track`);
+  }
+}
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675

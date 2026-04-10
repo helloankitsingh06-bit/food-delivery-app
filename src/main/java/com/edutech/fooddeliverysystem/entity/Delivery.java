@@ -36,4 +36,11 @@ public class Delivery {
         PICKED,
         DELIVERED
     }
+<<<<<<< HEAD
+=======
+    public void setStatus(DeliveryStatus status) 
+    {
+        this.status = status;
+    }
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
 }

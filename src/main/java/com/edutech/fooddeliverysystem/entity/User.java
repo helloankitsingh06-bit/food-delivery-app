@@ -37,4 +37,11 @@ public class User {
         RESTAURANT,
         DELIVERY
     }
+<<<<<<< HEAD
+=======
+    public String getPassword() 
+    {
+        return password;
+    }
+>>>>>>> 51a45ed969f7088da582356274be73b751b03675
 }
