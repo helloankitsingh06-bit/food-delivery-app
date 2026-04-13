@@ -132,4 +132,5 @@ export class OrdersComponent implements OnInit, OnDestroy {
   getEstimatedDeliveryTime(): string {
     return '30-45 mins';
   }
+  
 }

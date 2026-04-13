@@ -8,10 +8,12 @@ import { HttpService } from '../services/http.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+
   credentials = {
     username: '',
     password: ''
   };
+
   errorMessage = '';
   loading = false;
 
@@ -23,9 +25,16 @@ export class LoginComponent {
 
     this.httpService.login(this.credentials).subscribe({
       next: (response: any) => {
-        localStorage.setItem('jwt_token', response.token);
+
+        // ✅ FIX 1: Store token with correct key
+        localStorage.setItem('token', response.token);
+
+        // ✅ Store user info
         localStorage.setItem('user_data', JSON.stringify(response.user));
 
+        console.log("Login success", response);
+
+        // ✅ Navigation based on role
         if (response.user.role === 'CUSTOMER') {
           this.router.navigate(['/restaurants']);
         } else if (response.user.role === 'RESTAURANT') {
@@ -33,7 +42,11 @@ export class LoginComponent {
         } else if (response.user.role === 'DELIVERY') {
           this.router.navigate(['/delivery']);
         }
+
+        // ✅ FIX 2: stop loading
+        this.loading = false;
       },
+
       error: (error: any) => {
         this.errorMessage = error.error?.message || 'Login failed. Please check your credentials.';
         this.loading = false;

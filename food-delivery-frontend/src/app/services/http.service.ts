@@ -11,8 +11,9 @@ export class HttpService {
 
   constructor(private http: HttpClient) {}
 
+  // ✅ SINGLE correct headers method
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token'); // IMPORTANT: use 'token'
     return new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
@@ -147,7 +148,7 @@ export class HttpService {
     return this.http.get(`${this.apiUrl}/delivery/partners/${id}/contact`, { headers: this.getHeaders() });
   }
 
-  // ✅ ADD THIS (missing earlier)
+  // ✅ FIXED (IMPORTANT)
   addMenuItem(restaurantId: number, item: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/restaurant/menu/${restaurantId}`,
