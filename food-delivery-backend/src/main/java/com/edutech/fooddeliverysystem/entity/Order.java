@@ -1,12 +1,15 @@
 package com.edutech.fooddeliverysystem.entity;
 
-import jakarta.persistence.Column;
+import java.util.List;
+
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,32 +19,35 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "orders")
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String email;
-
-    private String username;
-    private String password;
+    private double totalPrice;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Status status;
 
-    public enum Role {
-        CUSTOMER,
-        RESTAURANT,
-        DELIVERY
+    @ElementCollection
+    private List<String> items;
+
+    @ManyToOne
+    private User customer;
+
+    @ManyToOne
+    private Restaurant restaurant;
+
+    public enum Status {
+        PLACED,
+        PREPARING,
+        OUT_FOR_DELIVERY,
+        DELIVERED
     }
-<<<<<<< HEAD
-=======
-    public String getPassword() 
+    public void setStatus(Status status) 
     {
-        return password;
+        this.status = status;
     }
->>>>>>> 51a45ed969f7088da582356274be73b751b03675
 }

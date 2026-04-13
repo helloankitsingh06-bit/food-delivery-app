@@ -31,7 +31,7 @@ public class RestaurantController {
 
     @PostMapping("/create")
     public Restaurant createRestaurant(@RequestBody Restaurant restaurant) {
-        return restaurantService.createRestaurant(restaurant);
+    return restaurantService.save(restaurant);
     }
 
     @PostMapping("/menu")
