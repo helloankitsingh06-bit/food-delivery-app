@@ -1,0 +1,66 @@
+<div class="delivery-container">
+
+  <div class="delivery-card">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>Delivery Dashboard</h1>
+      <button class="btn-logout" (click)="logout()">Logout</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <span>Pending</span>
+        <h2>{{ getPendingCount() }}</h2>
+      </div>
+      <div class="stat-card">
+        <span>Active</span>
+        <h2>{{ getActiveCount() }}</h2>
+      </div>
+      <div class="stat-card">
+        <span>Completed</span>
+        <h2>{{ getCompletedCount() }}</h2>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && (!deliveries || deliveries.length === 0)" class="error">
+  Deliveries will be shown here
+</div>
+
+    <!-- Orders Grid -->
+    <div class="orders-grid">
+
+      <div *ngFor="let delivery of deliveries" class="order-card">
+
+        <div class="order-top">
+          <h3>#{{ delivery.orderId }}</h3>
+          <span class="status">{{ delivery.status }}</span>
+        </div>
+
+        <p>{{ delivery.restaurantName }}</p>
+        <p>{{ delivery.customerName }}</p>
+
+        <div class="actions">
+          <button *ngIf="delivery.status === 'PENDING'"
+                  (click)="acceptDelivery(delivery.orderId)">
+            Accept
+          </button>
+
+          <button *ngIf="delivery.status === 'ACCEPTED'"
+                  (click)="updateDeliveryStatus(delivery.orderId, 'PICKED_UP')">
+            Pickup
+          </button>
+
+          <button *ngIf="delivery.status === 'PICKED_UP'"
+                  (click)="updateDeliveryStatus(delivery.orderId, 'DELIVERED')">
+            Done
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

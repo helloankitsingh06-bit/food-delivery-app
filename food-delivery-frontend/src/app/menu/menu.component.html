@@ -1,0 +1,65 @@
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="menu-header">
+    <h2>🍽 Food<span>Royal</span></h2>
+
+    <div>
+      <button class="btn-outline" (click)="goBack()">Back</button>
+      <button class="btn-gold" (click)="toggleCart()">
+        🛒 {{ cart.length }} | ₹{{ getCartTotal() }}
+      </button>
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div class="menu-title">
+    <h1>{{ restaurantName || 'Menu' }}</h1>
+    <p>Premium Food Experience</p>
+  </div>
+
+  <!-- MENU -->
+  <div class="grid" *ngIf="menuItems?.length; else empty">
+    <div *ngFor="let item of menuItems" class="card">
+      <h3>{{ item.name }}</h3>
+      <p>{{ item.description || 'Delicious food item' }}</p>
+
+      <div class="card-bottom">
+        <span>₹{{ item.price }}</span>
+        <button class="btn-gold" (click)="addToCart(item)">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPTY -->
+  <ng-template #empty>
+    <p class="empty">Menu items will be shown here</p>
+  </ng-template>
+
+  <!-- CART -->
+  <div class="cart" [class.open]="showCart">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button (click)="toggleCart()">×</button>
+    </div>
+
+    <div *ngFor="let item of cart" class="cart-item">
+      <div>
+        <p>{{ item.name }}</p>
+        <small>₹{{ item.price }} x {{ item.quantity }}</small>
+      </div>
+
+      <div>
+        <button (click)="removeFromCart(item)">-</button>
+        <span>{{ item.quantity }}</span>
+        <button (click)="addToCart(item)">+</button>
+      </div>
+    </div>
+
+    <div class="cart-footer">
+      <h4>Total: ₹{{ getCartTotal() }}</h4>
+      <button class="btn-gold" (click)="placeOrder()">Place Order</button>
+    </div>
+  </div>
+
+</div>
