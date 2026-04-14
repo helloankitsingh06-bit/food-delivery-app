@@ -16,7 +16,6 @@
       <div class="form-group">
         <input
           type="text"
-          id="username"
           name="username"
           [(ngModel)]="userData.username"
           required
@@ -28,7 +27,6 @@
       <div class="form-group">
         <input
           type="email"
-          id="email"
           name="email"
           [(ngModel)]="userData.email"
           required
@@ -40,7 +38,6 @@
       <div class="form-group">
         <input
           type="password"
-          id="password"
           name="password"
           [(ngModel)]="userData.password"
           required
@@ -48,17 +45,16 @@
           placeholder="🔒 Create a password">
       </div>
 
-
       <!-- Role -->
       <div class="form-group">
         <select
-          id="role"
           name="role"
           [(ngModel)]="userData.role"
           required
           class="form-control">
 
-          <option value="" disabled selected>Select Role</option>
+          <!-- ✅ FIXED -->
+          <option [ngValue]="null" disabled>Select Role</option>
 
           <option *ngFor="let role of roles" [value]="role">
             {{ role }}

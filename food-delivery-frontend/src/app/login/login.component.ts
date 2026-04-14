@@ -10,7 +10,7 @@ import { HttpService } from '../services/http.service';
 export class LoginComponent {
 
   credentials = {
-    username: '',
+    email: '',   // ✅ FIXED (was username)
     password: ''
   };
 
@@ -26,28 +26,34 @@ export class LoginComponent {
     this.httpService.login(this.credentials).subscribe({
       next: (response: any) => {
 
-        // ✅ FIX 1: Store token with correct key
-        localStorage.setItem('token', response.token);
-
-        // ✅ Store user info
-        localStorage.setItem('user_data', JSON.stringify(response.user));
-
         console.log("Login success", response);
 
-        // ✅ Navigation based on role
-        if (response.user.role === 'CUSTOMER') {
+        // ✅ FIX: handle string or object response
+        const token = response.token || response;
+
+        localStorage.setItem('token', token);
+
+        if (response.user) {
+          localStorage.setItem('user_data', JSON.stringify(response.user));
+
+          // ✅ Role-based navigation
+          if (response.user.role === 'CUSTOMER') {
+            this.router.navigate(['/restaurants']);
+          } else if (response.user.role === 'RESTAURANT') {
+            this.router.navigate(['/dashboard']);
+          } else if (response.user.role === 'DELIVERY') {
+            this.router.navigate(['/delivery']);
+          }
+        } else {
+          // fallback if only token returned
           this.router.navigate(['/restaurants']);
-        } else if (response.user.role === 'RESTAURANT') {
-          this.router.navigate(['/dashboard']);
-        } else if (response.user.role === 'DELIVERY') {
-          this.router.navigate(['/delivery']);
         }
 
-        // ✅ FIX 2: stop loading
         this.loading = false;
       },
 
       error: (error: any) => {
+        console.error(error);
         this.errorMessage = error.error?.message || 'Login failed. Please check your credentials.';
         this.loading = false;
       }

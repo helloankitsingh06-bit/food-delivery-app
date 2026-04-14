@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version> <!-- stable version -->
+        <version>3.3.5</version>
         <relativePath/>
     </parent>
 
@@ -19,9 +19,9 @@
     <name>fooddeliverysystem</name>
     <description>Food Delivery Backend</description>
 
-    <!-- 🔥 Java Version -->
+    <!-- 🔥 Java Version - Change to match your installed Java -->
     <properties>
-        <java.version>17</java.version>
+        <java.version>24</java.version>  <!-- Changed from 17 to 24 -->
     </properties>
 
     <!-- 🔥 DEPENDENCIES -->
@@ -59,14 +59,26 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- JWT -->
+        <!-- 🔥 UPDATED JWT DEPENDENCIES for Java 17+ -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
         </dependency>
 
-        <!-- ✅ CORRECT TEST DEPENDENCY -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -78,13 +90,10 @@
     <!-- 🔥 BUILD -->
     <build>
         <plugins>
-
-            <!-- Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
         </plugins>
     </build>
 

@@ -8,6 +8,7 @@ import { HttpService } from '../services/http.service';
   styleUrls: ['./registration.component.css']
 })
 export class RegistrationComponent {
+
   userData = {
     username: '',
     password: '',
@@ -16,6 +17,7 @@ export class RegistrationComponent {
   };
 
   roles = ['CUSTOMER', 'RESTAURANT', 'DELIVERY'];
+
   successMessage = '';
   errorMessage = '';
   loading = false;
@@ -23,19 +25,25 @@ export class RegistrationComponent {
   constructor(private httpService: HttpService, private router: Router) {}
 
   onSubmit(): void {
+
+    // 🔥 DEBUG LINE (VERY IMPORTANT)
+    console.log("FORM DATA:", this.userData);
+
     this.loading = true;
     this.successMessage = '';
     this.errorMessage = '';
 
     this.httpService.register(this.userData).subscribe({
-      next: (response: any) => {
+      next: () => {
         this.successMessage = 'Registration successful! Redirecting to login...';
+
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
       },
       error: (error: any) => {
-        this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+        console.error(error);
+        this.errorMessage = 'Registration failed';
         this.loading = false;
       }
     });
