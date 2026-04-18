@@ -11,6 +11,7 @@ export class RegistrationComponent {
 
   userData = {
     username: '',
+    name: '',        // ✅ added
     password: '',
     email: '',
     role: 'CUSTOMER'

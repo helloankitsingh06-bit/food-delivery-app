@@ -1,62 +1,38 @@
 package com.edutech.fooddeliverysystem.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ✅ REQUIRED (used for login / display / API)
     private String username;
+
+    // ✅ REQUIRED (full name)
+    private String name;
+    
     private String email;
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // ✅ DEFAULT CONSTRUCTOR (VERY IMPORTANT)
-    public User() {}
-
-    // ✅ GETTERS & SETTERS (VERY IMPORTANT)
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
+    // 🔗 One user can own multiple restaurants
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Restaurant> restaurants;
 
     public enum Role {
         CUSTOMER,

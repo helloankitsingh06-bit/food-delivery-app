@@ -1,3 +1,5 @@
+
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
@@ -21,7 +23,7 @@
 
     <!-- 🔥 Java Version - Change to match your installed Java -->
     <properties>
-        <java.version>24</java.version>  <!-- Changed from 17 to 24 -->
+        <java.version>17</java.version>  <!-- Changed from 17 to 24 -->
     </properties>
 
     <!-- 🔥 DEPENDENCIES -->
@@ -59,7 +61,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- 🔥 UPDATED JWT DEPENDENCIES for Java 17+ -->
+        <!-- UPDATED JWT DEPENDENCIES for Java 17+ -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>

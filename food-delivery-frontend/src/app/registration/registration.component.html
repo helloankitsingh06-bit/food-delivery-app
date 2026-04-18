@@ -23,6 +23,17 @@
           placeholder="👤 Choose a username">
       </div>
 
+      <!-- Name -->
+      <div class="form-group">
+        <input
+          type="text"
+          name="name"
+          [(ngModel)]="userData.name"
+          required
+          class="form-control"
+          placeholder="🧑 Enter your full name">
+      </div>
+
       <!-- Email -->
       <div class="form-group">
         <input
@@ -53,7 +64,6 @@
           required
           class="form-control">
 
-          <!-- ✅ FIXED -->
           <option [ngValue]="null" disabled>Select Role</option>
 
           <option *ngFor="let role of roles" [value]="role">

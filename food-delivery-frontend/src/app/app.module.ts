@@ -11,7 +11,7 @@ import { RestaurantsComponent } from './restaurants/restaurants.component';
 import { MenuComponent } from './menu/menu.component';
 import { OrdersComponent } from './orders/orders.component';
 import { DeliveryComponent } from './delivery/delivery.component';
-
+import { ProfileComponent } from './profile/profile.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -19,6 +19,10 @@ const routes: Routes = [
   { path: 'restaurants', component: RestaurantsComponent },
   { path: 'menu/:id', component: MenuComponent },
   { path: 'orders', component: OrdersComponent },
+  { 
+  path: 'profile', 
+  loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent) 
+},
   { path: 'delivery', component: DeliveryComponent },
   { path: 'dashboard', component: OrdersComponent }
 ];

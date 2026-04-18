@@ -2,13 +2,43 @@
 
   <div class="delivery-card">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <div class="header">
-      <h1>Delivery Dashboard</h1>
+      <h1>🚴 Delivery Dashboard</h1>
+
+      <!-- 🔥 LIVE STATUS -->
+      <span class="live-indicator">🟢 Live</span>
+
       <button class="btn-logout" (click)="logout()">Logout</button>
     </div>
 
-    <!-- Stats -->
+    <!-- 🔥 TOP BAR -->
+    <div class="top-bar">
+
+      <input type="text"
+             placeholder="Search order or customer..."
+             [(ngModel)]="searchTerm">
+
+      <div class="filters">
+        <button [class.active]="statusFilter==='ALL'" (click)="statusFilter='ALL'">All</button>
+        <button [class.active]="statusFilter==='PENDING'" (click)="statusFilter='PENDING'">Pending</button>
+        <button [class.active]="statusFilter==='ACTIVE'" (click)="statusFilter='ACTIVE'">Active</button>
+        <button [class.active]="statusFilter==='DELIVERED'" (click)="statusFilter='DELIVERED'">Done</button>
+      </div>
+
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading">
+      Loading deliveries...
+    </div>
+
+    <!-- ERROR -->
+    <div *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </div>
+
+    <!-- 🔥 STATS + EXTRA -->
     <div class="stats">
       <div class="stat-card">
         <span>Pending</span>
@@ -24,38 +54,70 @@
       </div>
     </div>
 
-    <div *ngIf="!loading && (!deliveries || deliveries.length === 0)" class="error">
-  Deliveries will be shown here
-</div>
+    <!-- 🔥 EMPTY -->
+    <div *ngIf="!loading && getFilteredDeliveries().length === 0" class="empty">
+      No deliveries available
+    </div>
 
-    <!-- Orders Grid -->
+    <!-- ORDERS GRID -->
     <div class="orders-grid">
 
-      <div *ngFor="let delivery of deliveries" class="order-card">
+      <div *ngFor="let delivery of getFilteredDeliveries()"
+           class="order-card"
+           [class.new]="delivery.status === 'PENDING'"
+           [class.priority]="getElapsedTime(delivery.createdAt) > '20'">
 
+        <!-- TOP -->
         <div class="order-top">
           <h3>#{{ delivery.orderId }}</h3>
-          <span class="status">{{ delivery.status }}</span>
+
+          <span class="status"
+                [ngClass]="getStatusClass(delivery.status)">
+            {{ getStatusIcon(delivery.status) }} {{ delivery.status }}
+          </span>
         </div>
 
-        <p>{{ delivery.restaurantName }}</p>
-        <p>{{ delivery.customerName }}</p>
+        <!-- ⏱ TIMER -->
+        <p class="time">
+          ⏱ {{ getElapsedTime(delivery.createdAt) }}
+        </p>
 
+        <!-- INFO -->
+        <p><strong>Restaurant:</strong> {{ delivery.restaurantName }}</p>
+        <p><strong>Customer:</strong> {{ delivery.customerName }}</p>
+        <p><strong>Address:</strong> {{ delivery.address }}</p>
+
+        <!-- ITEMS -->
+        <p class="items">
+          <strong>Items:</strong> {{ getItemsList(delivery.items) }}
+        </p>
+
+        <!-- 🔥 QUICK ACTION -->
         <div class="actions">
+
           <button *ngIf="delivery.status === 'PENDING'"
+                  class="btn-accept"
                   (click)="acceptDelivery(delivery.orderId)">
-            Accept
+            ⚡ Accept
           </button>
 
           <button *ngIf="delivery.status === 'ACCEPTED'"
-                  (click)="updateDeliveryStatus(delivery.orderId, 'PICKED_UP')">
-            Pickup
+                  class="btn-pickup"
+                  (click)="markPickedUp(delivery.orderId)">
+            📦 Pickup
           </button>
 
           <button *ngIf="delivery.status === 'PICKED_UP'"
-                  (click)="updateDeliveryStatus(delivery.orderId, 'DELIVERED')">
-            Done
+                  class="btn-done"
+                  (click)="markDelivered(delivery.orderId)">
+            ✅ Delivered
           </button>
+
+          <button class="btn-view"
+                  (click)="viewOrderDetails(delivery)">
+            👁 View
+          </button>
+
         </div>
 
       </div>
@@ -63,4 +125,70 @@
     </div>
 
   </div>
+
+  <!-- ========================= -->
+  <!-- 🔍 ORDER DETAILS MODAL -->
+  <!-- ========================= -->
+  <div *ngIf="selectedOrder" class="modal-overlay">
+
+    <div class="modal">
+
+      <h2>📦 Order Details</h2>
+
+      <p><strong>Order ID:</strong> {{ selectedOrder.orderId }}</p>
+      <p><strong>Restaurant:</strong> {{ selectedOrder.restaurantName }}</p>
+      <p><strong>Customer:</strong> {{ selectedOrder.customerName }}</p>
+      <p><strong>Address:</strong> {{ selectedOrder.address }}</p>
+
+      <!-- STATUS -->
+      <p>
+        <strong>Status:</strong>
+        <span [ngClass]="getStatusClass(selectedOrder.status)">
+          {{ getStatusIcon(selectedOrder.status) }} {{ selectedOrder.status }}
+        </span>
+      </p>
+
+      <!-- TIMER -->
+      <p class="time">
+        ⏱ {{ getElapsedTime(selectedOrder.createdAt) }}
+      </p>
+
+      <!-- ITEMS -->
+      <p><strong>Items:</strong> {{ getItemsList(selectedOrder.items) }}</p>
+
+      <!-- 🔥 MAP -->
+      <div id="map" class="map"></div>
+
+      <!-- 🔥 ETA (future-ready) -->
+      <p class="eta">🚀 ETA: {{ getElapsedTime(selectedOrder.createdAt) }}</p>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+
+        <button *ngIf="selectedOrder.status === 'PENDING'"
+                class="btn-accept"
+                (click)="acceptDelivery(selectedOrder.orderId)">
+          Accept
+        </button>
+
+        <button *ngIf="selectedOrder.status === 'ACCEPTED'"
+                class="btn-pickup"
+                (click)="markPickedUp(selectedOrder.orderId)">
+          Pickup
+        </button>
+
+        <button *ngIf="selectedOrder.status === 'PICKED_UP'"
+                class="btn-done"
+                (click)="markDelivered(selectedOrder.orderId)">
+          Delivered
+        </button>
+
+      </div>
+
+      <button class="btn-close" (click)="closeDetails()">Close</button>
+
+    </div>
+
+  </div>
+
 </div>

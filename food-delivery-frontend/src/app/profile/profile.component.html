@@ -1,0 +1,32 @@
+<div class="profile-container">
+
+  <div class="profile-card">
+
+    <div class="profile-header">
+      <div class="avatar">👤</div>
+      <h2>{{ user.name }}</h2>
+      <p>{{ user.email }}</p>
+    </div>
+
+    <div class="profile-details">
+
+      <div class="detail">
+        <span>📞 Phone</span>
+        <p>{{ user.phone }}</p>
+      </div>
+
+      <div class="detail">
+        <span>📍 Address</span>
+        <p>{{ user.address }}</p>
+      </div>
+
+    </div>
+
+    <div class="profile-actions">
+      <button (click)="goBack()">⬅ Back</button>
+      <button class="logout" (click)="logout()">Logout</button>
+    </div>
+
+  </div>
+
+</div>

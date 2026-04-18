@@ -23,33 +23,36 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // REGISTER
+    // ================= REGISTER =================
     @PostMapping("/register")
     public User register(@RequestBody User user) {
         return userService.register(user);
     }
 
-    // LOGIN
+    // ================= LOGIN =================
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
 
-        String email = request.get("email");
-        String password = request.get("password");
+    String email = request.get("email");
+    String password = request.get("password");
 
-        Optional<User> user = userService.login(email, password);
+    Optional<User> user = userService.login(email, password);
 
-        if (user.isPresent()) {
+    Map<String, Object> response = new HashMap<>();
 
-            // ✅ SIMPLE TOKEN (NO ROLE FOR NOW)
-            String token = jwtUtil.generateToken(email);
+    if (user.isPresent()) {
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            response.put("user", user.get());
+        String token = jwtUtil.generateToken(email);
 
-            return ResponseEntity.ok(response);
-        }
+        response.put("token", token);
+        response.put("user", user.get());
 
-        return ResponseEntity.status(401).body("Invalid credentials");
+        return ResponseEntity.ok(response);
     }
+
+    // ✅ RETURN JSON (NOT STRING)
+    response.put("message", "Invalid credentials");
+
+    return ResponseEntity.status(401).body(response);
+}
 }

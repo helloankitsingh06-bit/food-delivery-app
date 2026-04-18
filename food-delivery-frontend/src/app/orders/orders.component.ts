@@ -14,32 +14,42 @@ export class OrdersComponent implements OnInit, OnDestroy {
   orders: any[] = [];
   filteredOrders: any[] = [];
 
+  // ✅ MENU
+  menuItems: any[] = [];
+
   loading = true;
   errorMessage = '';
 
-  // ✅ REQUIRED VARIABLES (your errors)
-  searchTerm: string = '';
-  statusFilter: string = 'ALL';
-  dateFilter: string = 'ALL';
+  searchTerm = '';
+  statusFilter = 'ALL';
+  dateFilter = 'ALL';
 
-  userRole: string = '';
-  userName: string = '';
-  userAvatar: string = '';
+  userRole = '';
+  userName = '';
+  userAvatar = '';
 
-  notificationCount: number = 0;
-
-  showNotifications = false;
-  showProfileMenu = false;
-  showSidebar = false;
-  showRatingModal = false;
-  showIssueModal = false;
-  showHelpModal: boolean = false;
+  notificationCount = 0;
 
   ratingFeedback = '';
   issueType = '';
   issueDescription = '';
 
+  showNotifications = false;
+  showProfileMenu = false;
+  showSidebar = false;
+
+  showRatingModal = false;
+  showHelpModal = false;
+
   selectedOrder: any = null;
+
+  editItem: any = null;
+  editName: string = '';
+  editPrice: number = 0;
+
+  activeSection: string = 'orders';
+
+  restaurantId: number = 0;
 
   private destroy$ = new Subject<void>();
 
@@ -49,8 +59,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.initializeUser();
-    this.loadOrders();
+    this.initUser(); // ✅ FIXED NAME
+    this.loadMyRestaurant();
   }
 
   ngOnDestroy(): void {
@@ -58,20 +68,54 @@ export class OrdersComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  initializeUser(): void {
+  // ===== USER =====
+  initUser(): void {
     const user = this.authService.getUser();
     this.userRole = this.authService.getUserRole();
     this.userName = user?.name || 'User';
     this.userAvatar = user?.avatar || '';
   }
 
+  // ===== EDIT =====
+  startEdit(item: any): void {
+    this.editItem = item;
+    this.editName = item.name;
+    this.editPrice = item.price;
+  }
+
+  saveEdit(): void {
+    const updated = {
+      name: this.editName,
+      price: this.editPrice
+    };
+
+    this.httpService.updateMenuItem(this.editItem.id, updated).subscribe({
+      next: () => {
+        alert('Updated!');
+        this.editItem = null;
+        this.loadMenu();
+      },
+      error: () => {
+        alert('Update failed');
+      }
+    });
+  }
+
+  // ===== LOAD ORDERS =====
   loadOrders(): void {
-    this.httpService.getCustomerOrders()
+    const role = this.userRole;
+
+    const request =
+      role === 'RESTAURANT'
+        ? this.httpService.getRestaurantOrders()
+        : this.httpService.getCustomerOrders();
+
+    request
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
-          this.orders = data;
-          this.filteredOrders = data;
+          this.orders = data || [];
+          this.filteredOrders = [...this.orders];
           this.loading = false;
         },
         error: () => {
@@ -81,56 +125,112 @@ export class OrdersComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ===== LOAD MENU (FIXED) =====
+  loadMenu(): void {
+    this.httpService.getMenuByRestaurant(this.restaurantId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.menuItems = data;
+        },
+        error: () => {
+          alert('Failed to load menu');
+        }
+      });
+  }
+
+  // ===== DELETE MENU =====
+  deleteMenu(id: number): void {
+    this.httpService.deleteMenuItem(id).subscribe({
+      next: () => {
+        alert('Deleted!');
+        this.loadMenu();
+      },
+      error: () => {
+        alert('Delete failed');
+      }
+    });
+  }
+
+  // ===== FILTER =====
   filterOrders(): void {
-    let filtered = [...this.orders];
+    let data = [...this.orders];
 
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(o =>
-        o.id?.toLowerCase().includes(term) ||
+      data = data.filter(o =>
+        o.id?.toString().toLowerCase().includes(term) ||
         o.restaurantName?.toLowerCase().includes(term)
       );
     }
 
-    this.filteredOrders = filtered;
+    if (this.statusFilter !== 'ALL') {
+      data = data.filter(o => o.status === this.statusFilter);
+    }
+
+    this.filteredOrders = data;
   }
 
-  // ===== UI FUNCTIONS =====
+  // ===== UI =====
+  toggleSidebar() { this.showSidebar = !this.showSidebar; }
+  toggleNotifications() { this.showNotifications = !this.showNotifications; }
+  toggleProfileMenu() { this.showProfileMenu = !this.showProfileMenu; }
 
-  toggleSidebar(): void {
-    this.showSidebar = !this.showSidebar;
+  setSection(section: string): void {
+    this.activeSection = section;
   }
 
-  toggleNotifications(): void {
-    this.showNotifications = !this.showNotifications;
+  trackOrder(id: any) {
+    this.selectedOrder = this.orders.find(o => o.id === id);
   }
 
-  toggleProfileMenu(): void {
-    this.showProfileMenu = !this.showProfileMenu;
-  }
+  closeTracking() { this.selectedOrder = null; }
+  closeRatingModal() { this.showRatingModal = false; }
+  closeHelpModal() { this.showHelpModal = false; }
 
-  closeTracking(): void {
-    this.selectedOrder = null;
-  }
-
-  closeRatingModal(): void {
-    this.showRatingModal = false;
-  }
-
-  closeHelpModal(): void {
-    this.showIssueModal = false;
-  }
-
-  submitRating(): void {
-    alert('Rating submitted');
-  }
-
-  submitIssue(): void {
-    alert('Issue submitted');
-  }
+  submitRating() { alert('Rating submitted'); }
+  submitIssue() { alert('Issue submitted'); }
 
   getEstimatedDeliveryTime(): string {
     return '30-45 mins';
   }
-  
+
+  // ===== ADD MENU =====
+  addTestItem(): void {
+    const item = {
+      name: 'Burger',
+      price: 150
+    };
+
+    this.httpService.addMenuItem(this.restaurantId, item)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          alert('Menu item added!');
+          this.loadMenu(); // ✅ refresh
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Failed to add menu');
+        }
+      });
+  }
+
+  // ===== LOAD MY RESTAURANT =====
+  loadMyRestaurant(): void {
+    const user = this.authService.getUser();
+
+    this.httpService.getMyRestaurant(user.id).subscribe({
+      next: (res: any) => {
+        this.restaurantId = res.id;
+
+        // ✅ load after ID comes
+        this.loadMenu();
+        this.loadOrders();
+      },
+      error: () => {
+        alert('Failed to load restaurant');
+      }
+    });
+  }
 }

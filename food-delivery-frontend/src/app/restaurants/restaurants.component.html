@@ -1,20 +1,64 @@
 <div class="restaurants-container">
+
+  <!-- Navbar -->
   <div class="glass-navbar">
-    <div class="logo">
-      <span class="logo-icon">🍽️</span>
-      <span class="logo-text">FOOD<span class="gold">ELITE</span></span>
+
+    <!-- LEFT -->
+    <div class="nav-left">
+      <div class="logo">
+        <span class="logo-icon">🍽️</span>
+        <span class="logo-text">FOOD<span class="gold">ELITE</span></span>
+      </div>
+
+      <!-- LOCATION -->
+      <div class="location-wrapper">
+
+        <!-- Selected Location -->
+        <div class="location-display" (click)="toggleLocationDropdown($event)">
+          📍 <span class="location-text">{{ selectedLocation }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+
+        <!-- Dropdown -->
+        <div class="location-dropdown" *ngIf="showLocationDropdown" (click)="$event.stopPropagation()">
+
+          <div
+            class="location-item"
+            *ngFor="let loc of locations"
+            (click)="selectLocation(loc, $event)"
+          >
+            {{ loc }}
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="add-location" (click)="addLocation()">
+            ➕ Add Address
+          </div>
+
+        </div>
+      </div>
     </div>
-    <button class="btn-logout" (click)="logout()">
-      <span class="logout-icon">↺</span> LOGOUT
-    </button>
+
+    <!-- RIGHT -->
+    <div class="nav-right">
+      <button class="profile-btn" (click)="goToProfile()">
+        👤 Profile
+      </button>
+    </div>
+
   </div>
 
+  <!-- Hero Section -->
   <div class="hero-section">
     <h1 class="hero-title">
       <span class="gold-text">PREMIUM</span> DINING
       <span class="gold-text">EXPERIENCE</span>
     </h1>
-    <p class="hero-subtitle">Discover the finest restaurants curated just for you</p>
+
+    <p class="hero-subtitle">
+      Discover the finest restaurants curated just for you
+    </p>
 
     <div class="search-container">
       <div class="search-wrapper">
@@ -24,87 +68,57 @@
           [(ngModel)]="searchTerm"
           placeholder="Search by restaurant name or cuisine..."
           class="search-input">
-        <span class="search-shortcut">⌘K</span>
       </div>
     </div>
   </div>
 
+  <!-- Loading -->
   <div *ngIf="loading" class="loading-container">
     <div class="loader"></div>
     <p class="loading-text">Loading exclusive restaurants...</p>
   </div>
 
+  <!-- Error -->
   <div *ngIf="errorMessage" class="alert-error">
-    <span class="error-icon">⚠️</span> {{ errorMessage }}
+    ⚠️ {{ errorMessage }}
   </div>
 
-  <div class="stats-bar" *ngIf="!loading && restaurants.length > 0">
-    <div class="stat-item">
-      <span class="stat-value">{{ restaurants.length }}</span>
-      <span class="stat-label">Restaurants</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-      <span class="stat-value">{{ getTotalCuisines() }}</span>
-      <span class="stat-label">Cuisines</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat-item">
-      <span class="stat-value">{{ getAverageRating() }}</span>
-      <span class="stat-label">Avg Rating</span>
-    </div>
-  </div>
-
+  <!-- Restaurants -->
   <div class="restaurants-grid" *ngIf="!loading">
-    <div *ngFor="let restaurant of filteredRestaurants; let i = index"
+    <div *ngFor="let restaurant of filteredRestaurants"
          class="restaurant-card"
-         [style.animation-delay]="i * 0.05 + 's'"
          (click)="viewMenu(restaurant.id)">
-      <div class="card-glow"></div>
+
       <div class="card-image">
-        <img [src]="restaurant.imageUrl || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop'" [alt]="restaurant.name">
-        <div class="image-overlay">
-          <div class="rating-badge">
-            <span class="star-icon">★</span>
-            <span class="rating-number">{{ restaurant.rating || '4.5' }}</span>
-          </div>
-          <div class="delivery-badge">
-            <span class="time-icon">⏱️</span>
-            {{ restaurant.deliveryTime || '30-45' }} min
-          </div>
-        </div>
+        <img [src]="restaurant.imageUrl || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'">
       </div>
+
       <div class="card-content">
-        <div class="restaurant-header">
-          <h3>{{ restaurant.name }}</h3>
-          <div class="verified-badge" *ngIf="i % 2 === 0">
-            <span>✓</span> VERIFIED
-          </div>
-        </div>
+        <h3>{{ restaurant.name }}</h3>
+
         <div class="cuisine-section">
           <span class="cuisine-tag">{{ restaurant.cuisine || 'Multi-Cuisine' }}</span>
-          <span class="price-range">$$ • Moderate</span>
         </div>
+
         <p class="address">
-          📍 {{ restaurant.address || 'Downtown, City Center' }}
+          📍 {{ restaurant.address || 'City Center' }}
         </p>
-        <div class="features">
-          <span class="feature">🚚 Free Delivery</span>
-          <span class="feature">💳 Online Payment</span>
+
+        <div class="rating">
+          ⭐ {{ restaurant.rating || '4.5' }}
         </div>
+
         <button class="btn-view-menu">
-          EXPLORE MENU
-          <span class="btn-icon">→</span>
+          EXPLORE MENU →
         </button>
       </div>
-      <div class="card-border"></div>
     </div>
   </div>
 
+  <!-- No Results -->
   <div *ngIf="filteredRestaurants.length === 0 && !loading && !errorMessage" class="no-results">
-    <div class="no-results-icon">🔍</div>
     <h3>No Results Found</h3>
-    <p>We couldn't find any restaurants matching "{{ searchTerm }}"</p>
-    <button class="btn-clear" (click)="searchTerm = ''">Clear Search</button>
+    <p>Restaurants will be shown here</p>
   </div>
+
 </div>

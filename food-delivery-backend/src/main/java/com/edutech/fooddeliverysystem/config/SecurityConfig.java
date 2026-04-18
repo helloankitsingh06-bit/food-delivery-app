@@ -17,6 +17,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll() // ✅ allow login/register
+                .requestMatchers("/api/restaurant/menu/**").permitAll()
                 .anyRequest().permitAll()
             );
 

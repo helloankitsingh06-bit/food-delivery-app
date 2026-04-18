@@ -11,6 +11,7 @@ export class HttpService {
 
   constructor(private http: HttpClient) {}
 
+  // ================= COMMON HEADERS =================
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
 
@@ -30,15 +31,27 @@ export class HttpService {
   }
 
   // ================= CUSTOMER =================
+
+  // ✅ NEW (as per your STEP 3)
+  getRestaurants(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/customer/restaurants`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // ✅ Existing (keep this also)
   getAllRestaurants(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/customer/restaurants`, { headers: this.getHeaders() });
+    return this.http.get(`${this.apiUrl}/customer/restaurants`, {
+      headers: this.getHeaders()
+    });
   }
 
   getRestaurantMenu(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/customer/menu/${id}`, { headers: this.getHeaders() });
+    return this.http.get(`${this.apiUrl}/customer/menu/${id}`, {
+      headers: this.getHeaders()
+    });
   }
 
-  // ✅ FIXED (takes 2 args)
   placeOrder(restaurantId: number, data: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/customer/order?restaurantId=${restaurantId}`,
@@ -48,20 +61,25 @@ export class HttpService {
   }
 
   getCustomerOrders(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/customer/orders`, { headers: this.getHeaders() });
+    return this.http.get(`${this.apiUrl}/customer/orders`, {
+      headers: this.getHeaders()
+    });
   }
 
   // ================= RESTAURANT =================
+
   addMenuItem(restaurantId: number, item: any): Observable<any> {
     return this.http.post(
-      `${this.apiUrl}/restaurant/menu/${restaurantId}`,
+      `${this.apiUrl}/restaurant/menu?restaurantId=${restaurantId}`,
       item,
       { headers: this.getHeaders() }
     );
   }
 
-  getRestaurantOrders(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/restaurant/orders/${id}`, { headers: this.getHeaders() });
+  getRestaurantOrders(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/restaurant/orders`, {
+      headers: this.getHeaders()
+    });
   }
 
   updateOrderStatus(orderId: number, status: string): Observable<any> {
@@ -72,14 +90,38 @@ export class HttpService {
     );
   }
 
-  // ================= DELIVERY =================
+  // ================= MENU =================
 
-  // ✅ FIXED (no argument needed now)
-  getDeliveryOrders(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/delivery/orders`, { headers: this.getHeaders() });
+  getMenuByRestaurant(restaurantId: number): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/restaurant/menu?restaurantId=${restaurantId}`,
+      { headers: this.getHeaders() }
+    );
   }
 
-  // ✅ FIXED (same name as component expects)
+  deleteMenuItem(id: number): Observable<any> {
+    return this.http.delete(
+      `${this.apiUrl}/restaurant/menu/${id}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateMenuItem(id: number, item: any): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/restaurant/menu/${id}`,
+      item,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ================= DELIVERY =================
+
+  getDeliveryOrders(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/delivery/orders`, {
+      headers: this.getHeaders()
+    });
+  }
+
   updateDeliveryStatus(orderId: number, status: string): Observable<any> {
     return this.http.put(
       `${this.apiUrl}/delivery/update/${orderId}?status=${status}`,
@@ -87,4 +129,9 @@ export class HttpService {
       { headers: this.getHeaders() }
     );
   }
+  getMyRestaurant(userId: number) {
+  return this.http.get(`${this.apiUrl}/restaurant/my?userId=${userId}`, {
+    headers: this.getHeaders()
+  });
+}
 }
