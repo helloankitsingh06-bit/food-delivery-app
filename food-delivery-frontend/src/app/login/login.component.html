@@ -1,63 +1,122 @@
 <div class="login-container">
 
+  <!-- PARTICLES -->
+  <div class="particles">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+
   <div class="login-overlay"></div>
 
-  <div class="login-card">
+  <div class="login-card" #card [class.success-mode]="loginSuccess">
 
-    <h1 class="app-title">🍽 Food<span>Royal</span></h1>
-    <p class="tagline">Premium Food Delivery Experience</p>
+    <!-- 🔥 LOGIN UI -->
+    <div *ngIf="!loginSuccess" class="login-content">
 
-    <h2 class="login-heading">Welcome Back</h2>
+      <!-- LOTTIE -->
+      <div #lottie class="lottie-box"></div>
 
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <!-- HEADER -->
+      
+      <p class="tagline">Premium Food Delivery Experience</p>
 
-      <div class="form-group">
-        <input
-          type="email"
-          id="email"
-          name="email"
-          [(ngModel)]="credentials.email"
-          required
-          class="form-control"
-          placeholder="📧 Email">
+      <h2 class="login-heading">Welcome Back</h2>
+
+      <!-- FORM -->
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate>
+
+        <!-- EMAIL -->
+        <div class="form-group">
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="credentials.email"
+            required
+            email
+            #email="ngModel"
+            class="form-control"
+            placeholder="📧 Email"
+            autocomplete="email">
+
+          <small *ngIf="email.invalid && email.touched" class="error-text">
+            Enter valid email
+          </small>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="form-group password-group">
+
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            [(ngModel)]="credentials.password"
+            required
+            minlength="4"
+            #password="ngModel"
+            class="form-control"
+            placeholder="🔒 Password"
+            autocomplete="current-password">
+
+          <span class="toggle-password"
+                (click)="showPassword = !showPassword">
+            {{ showPassword ? '🙈' : '👁' }}
+          </span>
+
+          <small *ngIf="password.invalid && password.touched" class="error-text">
+            Min 4 characters
+          </small>
+
+        </div>
+
+        <!-- OPTIONS -->
+        <div class="login-options">
+          <label>
+            <input type="checkbox" [(ngModel)]="rememberMe" name="remember">
+            Remember me
+          </label>
+
+          <span class="forgot" (click)="forgotPassword()">Forgot?</span>
+        </div>
+
+        <!-- ERROR -->
+        <div *ngIf="errorMessage" class="alert-error">
+          {{ errorMessage }}
+        </div>
+
+        <!-- BUTTON -->
+        <button
+          type="submit"
+          class="btn-login"
+          [disabled]="loading || !loginForm.valid">
+
+          <span *ngIf="!loading">Login →</span>
+          <span *ngIf="loading">⏳ Logging...</span>
+
+        </button>
+
+      </form>
+
+      <!-- DIVIDER -->
+      <div class="divider"><span>OR</span></div>
+
+      <!-- 🔥 REGISTER SECTION (UPDATED) -->
+      <div class="register-link">
+        <p class="new-text">New here?</p>
+        <a routerLink="/register" class="register-btn">
+          Create an account →
+        </a>
       </div>
 
-      <div class="form-group">
-        <input
-          type="password"
-          id="password"
-          name="password"
-          [(ngModel)]="credentials.password"
-          required
-          class="form-control"
-          placeholder="🔒 Password">
-      </div>
-
-      <div *ngIf="errorMessage" class="alert-error">
-        {{ errorMessage }}
-      </div>
-
-      <button type="submit" class="btn-login" [disabled]="loading">
-        {{ loading ? 'Logging in...' : 'Login →' }}
-      </button>
-
-    </form>
-
-    <div class="divider">
-      <span>OR</span>
     </div>
 
-    <div class="register-link">
-      <p>New here?</p>
-      <a routerLink="/register">Create an account</a>
-    </div>
+    <!-- 🎉 SUCCESS SCREEN -->
+    <div *ngIf="loginSuccess" class="success-container">
 
-    <!-- ✅ FIXED EMAIL DISPLAY -->
-    <div class="demo-box">
-      <h4>Demo Accounts</h4>
-      <p><strong>👤 Customer:</strong> customer1&#64;mail.com / 12345</p>
-      <p><strong>🍽 Restaurant:</strong> restaurant1&#64;mail.com / 12345</p>
-      <p><strong>🚚 Delivery:</strong> delivery1&#64;mail.com / 12345</p>
+      <div #successLottie class="success-lottie"></div>
+
+      <h2>Welcome 🎉</h2>
+      <p>Logging you in...</p>
+
     </div>
 
   </div>

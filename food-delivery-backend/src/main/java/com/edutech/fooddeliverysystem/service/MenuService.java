@@ -21,28 +21,38 @@ public class MenuService {
 
     public Menu addMenuItem(Long restaurantId, Menu menu) {
 
-    Restaurant restaurant = restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
-    menu.setRestaurant(restaurant);
+        menu.setRestaurant(restaurant);
 
-    return menuRepository.save(menu);
+        // auto set availability based on quantity
+        menu.setQuantity(menu.getQuantity());
+
+        return menuRepository.save(menu);
     }
 
     public List<Menu> getMenuByRestaurant(Long restaurantId) {
         return menuRepository.findByRestaurantId(restaurantId);
     }
+    
 
     public void deleteMenuItem(Long id) {
         menuRepository.deleteById(id);
     }
+
+
     public Menu updateMenuItem(Long id, Menu updatedMenu) {
-    Menu menu = menuRepository.findById(id)
+
+        Menu menu = menuRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Menu not found"));
 
-    menu.setName(updatedMenu.getName());
-    menu.setPrice(updatedMenu.getPrice());
+        menu.setName(updatedMenu.getName());
+        menu.setPrice(updatedMenu.getPrice());
+        menu.setDescription(updatedMenu.getDescription());
+        menu.setQuantity(updatedMenu.getQuantity());
+        menu.setImageUrl(updatedMenu.getImageUrl());
 
-    return menuRepository.save(menu);
-}
+        return menuRepository.save(menu);
+    }
 }

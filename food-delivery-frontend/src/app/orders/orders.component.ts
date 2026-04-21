@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpService } from '../services/http.service';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -55,17 +56,46 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   constructor(
     private httpService: HttpService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.initUser(); // ✅ FIXED NAME
+    this.initUser();
     this.loadMyRestaurant();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // ===== NAVIGATION =====
+  goToOrders() {
+    this.router.navigate(['/orders']);
+  }
+
+  goToMenu() {
+    this.router.navigate(['/menu']);
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
+  goToSettings() {
+    this.router.navigate(['/settings']);
+  }
+
+  // ✅ FIXED HERE
+  goToManageMenu() {
+    const restaurantId = 1; // 🔥 replace with actual logged-in restaurant ID
+    this.router.navigate(['/manage-menu', restaurantId]);
+  }
+
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 
   // ===== USER =====
@@ -125,7 +155,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ===== LOAD MENU (FIXED) =====
+  // ===== LOAD MENU =====
   loadMenu(): void {
     this.httpService.getMenuByRestaurant(this.restaurantId)
       .pipe(takeUntil(this.destroy$))
@@ -207,7 +237,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           alert('Menu item added!');
-          this.loadMenu(); // ✅ refresh
+          this.loadMenu();
         },
         error: (err) => {
           console.error(err);
@@ -223,8 +253,6 @@ export class OrdersComponent implements OnInit, OnDestroy {
     this.httpService.getMyRestaurant(user.id).subscribe({
       next: (res: any) => {
         this.restaurantId = res.id;
-
-        // ✅ load after ID comes
         this.loadMenu();
         this.loadOrders();
       },

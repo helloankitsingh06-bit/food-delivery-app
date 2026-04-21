@@ -78,25 +78,26 @@
 
           <!-- Profile Dropdown -->
           <div class="profile-dropdown" *ngIf="showProfileMenu">
-            <button (click)="setSection('orders'); showProfileMenu=false">
-              <i class="fas fa-box"></i> Orders
-            </button>
 
-            <button (click)="setSection('menu'); showProfileMenu=false">
-              <i class="fas fa-utensils"></i> Menu
-            </button>
+  <button (click)="goToOrders(); showProfileMenu=false">
+    <i class="fas fa-box"></i> Orders
+  </button>
 
-            <button (click)="setSection('profile'); showProfileMenu=false">
-              <i class="fas fa-user"></i> Profile
-            </button>
+  <button (click)="goToMenu(); showProfileMenu=false">
+    <i class="fas fa-utensils"></i> Menu
+  </button>
 
-            <button (click)="setSection('settings'); showProfileMenu=false">
-              <i class="fas fa-cog"></i> Settings
-            </button>
+  <button (click)="goToProfile(); showProfileMenu=false">
+    <i class="fas fa-user"></i> Profile
+  </button>
 
-            <hr>
-            <button (click)="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-          </div>
+  <hr>
+
+  <button (click)="logout()">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
+
+</div>
         </div>
       </div>
     </div>
@@ -201,7 +202,7 @@
       <button class="action-btn" *ngIf="userRole === 'CUSTOMER'" (click)="openSupportChat()">
         <i class="fas fa-headset"></i> Customer Support
       </button>
-      <button class="action-btn" *ngIf="userRole === 'RESTAURANT'" (click)="openMenuManager()">
+      <button class="action-btn" *ngIf="userRole === 'RESTAURANT'" (click)="goToManageMenu()">
         <i class="fas fa-edit"></i> Manage Menu
       </button>
       <button class="action-btn" *ngIf="userRole === 'RESTAURANT'" (click)="viewAnalytics()">

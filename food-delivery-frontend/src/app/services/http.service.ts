@@ -32,14 +32,12 @@ export class HttpService {
 
   // ================= CUSTOMER =================
 
-  // ✅ NEW (as per your STEP 3)
   getRestaurants(): Observable<any> {
     return this.http.get(`${this.apiUrl}/customer/restaurants`, {
       headers: this.getHeaders()
     });
   }
 
-  // ✅ Existing (keep this also)
   getAllRestaurants(): Observable<any> {
     return this.http.get(`${this.apiUrl}/customer/restaurants`, {
       headers: this.getHeaders()
@@ -68,10 +66,11 @@ export class HttpService {
 
   // ================= RESTAURANT =================
 
-  addMenuItem(restaurantId: number, item: any): Observable<any> {
+  // ✅ THIS IS YOUR REQUIRED METHOD (already correct)
+  addMenuItem(restaurantId: number, data: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/restaurant/menu?restaurantId=${restaurantId}`,
-      item,
+      data,
       { headers: this.getHeaders() }
     );
   }
@@ -129,9 +128,10 @@ export class HttpService {
       { headers: this.getHeaders() }
     );
   }
+
   getMyRestaurant(userId: number) {
-  return this.http.get(`${this.apiUrl}/restaurant/my?userId=${userId}`, {
-    headers: this.getHeaders()
-  });
-}
+    return this.http.get(`${this.apiUrl}/restaurant/my?userId=${userId}`, {
+      headers: this.getHeaders()
+    });
+  }
 }

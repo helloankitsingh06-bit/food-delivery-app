@@ -1,7 +1,10 @@
 /* 🌍 Full Page Background */
 .login-container {
   height: 100vh;
-  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  background: linear-gradient(-45deg, #0f0f0f, #1a1a1a, #000, #111);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,43 +13,126 @@
   overflow: hidden;
 }
 
-/* ✨ Background Glow Effect */
-.login-container::before {
-  content: "";
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(255,215,0,0.25), transparent);
-  top: -100px;
-  left: -100px;
+/* 🌈 BACKGROUND ANIMATION */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
+/* ✨ Glow */
+.login-container::before,
 .login-container::after {
   content: "";
   position: absolute;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(255,215,0,0.15), transparent);
+  background: radial-gradient(circle, rgba(255,215,0,0.2), transparent);
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.login-container::before {
+  top: -100px;
+  left: -100px;
+}
+
+.login-container::after {
   bottom: -100px;
   right: -100px;
 }
 
-/* 🧊 Glass Card */
-.login-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(15px);
-  border-radius: 16px;
-  padding: 30px;
-  width: 350px;
-  color: white;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+.login-container:hover::before {
+  transform: translate(20px, 20px);
 }
 
-/* 🍽 Title */
+.login-container:hover::after {
+  transform: translate(-20px, -20px);
+}
+
+/* OVERLAY */
+.login-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ================= PARTICLES ================= */
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.particles span {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: gold;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: floatParticles linear infinite;
+}
+
+.particles span:nth-child(1){ left:10%; animation-duration:8s; }
+.particles span:nth-child(2){ left:20%; animation-duration:12s; }
+.particles span:nth-child(3){ left:35%; animation-duration:10s; }
+.particles span:nth-child(4){ left:50%; animation-duration:14s; }
+.particles span:nth-child(5){ left:65%; animation-duration:9s; }
+.particles span:nth-child(6){ left:80%; animation-duration:11s; }
+.particles span:nth-child(7){ left:45%; animation-duration:13s; }
+.particles span:nth-child(8){ left:75%; animation-duration:15s; }
+
+@keyframes floatParticles {
+  0% { top: 100%; opacity: 0; }
+  50% { opacity: 0.6; }
+  100% { top: -10%; opacity: 0; }
+}
+
+/* 🧊 Glass Card */
+.login-card {
+  position: relative;
+  z-index: 2;
+
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(30px);
+  border-radius: 18px;
+  padding: 30px;
+  width: 360px;
+
+  color: white;
+
+  border: 1px solid rgba(255, 215, 0, 0.2);
+
+  box-shadow:
+    0 0 25px rgba(255, 215, 0, 0.15),
+    0 15px 50px rgba(0,0,0,0.9);
+
+  transform-style: preserve-3d;
+  transition: 0.3s ease;
+
+  animation: fadeIn 0.5s ease;
+}
+
+/* 🔥 SUCCESS MODE */
+.login-card.success-mode {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(0,255,150,0.4);
+}
+
+/* DEPTH */
+.login-card * {
+  transform: translateZ(20px);
+}
+
+/* TITLE */
 .app-title {
   text-align: center;
   font-size: 26px;
   margin-bottom: 5px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.6);
 }
 
 .app-title span {
@@ -65,7 +151,20 @@
   margin-bottom: 20px;
 }
 
-/* 🧾 Inputs */
+/* 🔥 LOTTIE FLOAT */
+.lottie-box {
+  width: 120px;
+  margin: 0 auto 10px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+/* INPUTS */
 .form-control {
   width: 100%;
   padding: 12px;
@@ -74,98 +173,144 @@
   border: none;
   background: rgba(255,255,255,0.08);
   color: white;
-}
-
-.form-control::placeholder {
-  color: #ccc;
+  transition: 0.3s;
 }
 
 .form-control:focus {
   outline: none;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  box-shadow: 0 0 12px rgba(255,215,0,0.7);
+  transform: scale(1.02);
 }
 
-/* 🟡 Button */
+.error-text {
+  color: #ff4d4d;
+  font-size: 11px;
+  margin-top: -10px;
+}
+
+/* PASSWORD */
+.password-group {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  cursor: pointer;
+}
+
+/* OPTIONS */
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.forgot {
+  color: gold;
+  cursor: pointer;
+}
+
+/* BUTTON */
 .btn-login {
   width: 100%;
   padding: 12px;
-  border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #FFD700, #FFB300);
-  color: black;
+  border: none;
   font-weight: 600;
   cursor: pointer;
+
+  background: linear-gradient(135deg, #FFD700, #FFB300);
+
+  position: relative;
+  overflow: hidden;
   transition: 0.3s;
 }
 
 .btn-login:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255,215,0,0.7);
+  box-shadow: 0 0 20px rgba(255,215,0,0.8);
 }
 
-/* ➖ Divider */
+.btn-login:active {
+  transform: scale(0.95);
+}
+
+/* SHINE */
+.btn-login::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: -100%;
+  top: 0;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+  transition: 0.5s;
+}
+
+.btn-login:hover::after {
+  left: 100%;
+}
+
+/* DIVIDER */
 .divider {
   text-align: center;
   margin: 15px 0;
   color: #aaa;
-  position: relative;
 }
 
-.divider::before,
-.divider::after {
-  content: "";
-  height: 1px;
-  width: 40%;
-  background: #444;
-  position: absolute;
-  top: 50%;
-}
-
-.divider::before {
-  left: 0;
-}
-
-.divider::after {
-  right: 0;
-}
-
-/* 🔗 Register */
+/* REGISTER */
 .register-link {
   text-align: center;
-  margin-top: 10px;
 }
 
 .register-link a {
   color: gold;
-  text-decoration: none;
 }
 
-/* 📦 Demo Box */
-.demo-box {
-  margin-top: 20px;
-  background: rgba(255,255,255,0.05);
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 12px;
-}
-
-/* ❌ Error */
+/* ERROR */
 .alert-error {
   background: #2a0000;
   color: #ff4d4d;
   padding: 8px;
   border-radius: 6px;
-  margin-bottom: 10px;
 }
 
-/* 🎬 Animation */
+/* 🎉 SUCCESS SCREEN */
+.success-container {
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.success-lottie {
+  width: 140px;
+  margin: auto;
+}
+
+.success-container h2 {
+  color: #00ffae;
+}
+
+/* ANIMATION */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.new-text {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.register-btn {
+  color: gold;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.register-btn:hover {
+  text-shadow: 0 0 10px gold;
 }

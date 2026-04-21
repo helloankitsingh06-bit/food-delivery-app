@@ -1,0 +1,50 @@
+<h2>Manage Menu</h2>
+
+<form (ngSubmit)="addItem()" #menuForm="ngForm">
+
+<label>Food Name:</label><br>
+<input type="text" name="name" [(ngModel)]="menuItem.name" required><br><br>
+
+<label>Price:</label><br>
+<input type="number" name="price" [(ngModel)]="menuItem.price" required><br><br>
+
+<label>Description:</label><br>
+<textarea name="description" [(ngModel)]="menuItem.description"></textarea><br><br>
+
+<label>Quantity Available:</label><br>
+<input type="number" name="quantity" [(ngModel)]="menuItem.quantity"><br><br>
+
+<label>Food Image:</label><br>
+<input type="file" (change)="onFileSelected($event)"><br><br>
+
+<button type="submit">
+  {{ isEditing ? 'Update Item' : 'Add Item' }}
+</button>
+
+</form>
+
+<hr>
+
+<h3>Menu Items</h3>
+
+<div class="menu-container">
+  <div class="menu-card" *ngFor="let item of menuList">
+
+    <img *ngIf="item.imageUrl"
+         [src]="item.imageUrl"
+         class="food-img">
+
+    <div class="card-content">
+      <h4>{{item.name}}</h4>
+      <p class="price">₹{{item.price}}</p>
+      <p>{{item.description}}</p>
+      <p class="qty">Available: {{item.quantity}}</p>
+
+      <div class="actions">
+        <button type="button" (click)="editItem(item)">✏️ Edit</button>
+        <button type="button" (click)="deleteItem(item.id)">🗑️ Delete</button>
+      </div>
+    </div>
+
+  </div>
+</div>

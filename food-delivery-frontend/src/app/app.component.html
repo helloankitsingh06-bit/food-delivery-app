@@ -1,13 +1,12 @@
-<router-outlet></router-outlet>
-<nav style="background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+<!-- 🔥 NAVBAR (ONLY WHEN ALLOWED) -->
+<nav *ngIf="showNavbar" class="navbar">
 
-  <h2 class="gold-gradient">FoodApp</h2>
-
-  <div>
-    <button class="btn-gold">Login</button>
-    <button class="btn-gold" style="margin-left: 10px;">Register</button>
+  <!-- 🔥 FUTURE READY (OPTIONAL LINKS) -->
+  <div class="nav-links" *ngIf="!isLoggedIn">
+    <!-- removed login/register buttons -->
   </div>
 
 </nav>
 
+<!-- 🔥 ROUTES -->
 <router-outlet></router-outlet>

@@ -2,31 +2,128 @@
 
   <div class="profile-card">
 
+    <!-- HEADER -->
     <div class="profile-header">
       <div class="avatar">👤</div>
-      <h2>{{ user.name }}</h2>
-      <p>{{ user.email }}</p>
+      <h2>{{ user?.name || 'User' }}</h2>
+      <p>{{ user?.email || 'No email available' }}</p>
     </div>
 
-    <div class="profile-details">
+    <!-- 🔥 TAB SWITCH -->
+    <div class="profile-tabs">
+      <button 
+        type="button"
+        (click)="setTab('profile')" 
+        [class.active]="activeTab === 'profile'">
+        👤 Profile
+      </button>
 
+      <button 
+        type="button"
+        (click)="setTab('orders')" 
+        [class.active]="activeTab === 'orders'">
+        🧾 Orders
+      </button>
+
+      <button 
+        type="button"
+        (click)="setTab('settings')" 
+        [class.active]="activeTab === 'settings'">
+        ⚙️ Settings
+      </button>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 👤 PROFILE (EDITABLE) -->
+    <!-- ========================= -->
+    <div *ngIf="activeTab === 'profile'" class="profile-details">
+
+      <!-- NAME -->
+      <div class="detail">
+        <span>👤 Name</span>
+        <input [(ngModel)]="user.name" [readonly]="!editMode">
+      </div>
+
+      <!-- PHONE -->
       <div class="detail">
         <span>📞 Phone</span>
-        <p>{{ user.phone }}</p>
+        <input [(ngModel)]="user.phone" [readonly]="!editMode">
       </div>
 
+      <!-- ADDRESS -->
       <div class="detail">
         <span>📍 Address</span>
-        <p>{{ user.address }}</p>
+        <input [(ngModel)]="user.address" [readonly]="!editMode">
+      </div>
+
+      <!-- 🔥 EDIT ACTIONS -->
+      <div class="edit-actions">
+
+        <button *ngIf="!editMode" (click)="enableEdit()">
+          ✏️ Edit
+        </button>
+
+        <button *ngIf="editMode" (click)="saveProfile()">
+          💾 Save
+        </button>
+
+        <button *ngIf="editMode" (click)="cancelEdit()">
+          ❌ Cancel
+        </button>
+
       </div>
 
     </div>
 
+    <!-- ========================= -->
+    <!-- 🧾 ORDERS -->
+    <!-- ========================= -->
+    <div *ngIf="activeTab === 'orders'" class="orders-section">
+
+      <p *ngIf="orders.length === 0" class="empty-state">
+        No orders yet 🍽️
+      </p>
+
+      <div *ngFor="let order of orders" class="order-card">
+        <p><strong>ID:</strong> {{ order.id }}</p>
+        <p><strong>Total:</strong> ₹{{ order.total }}</p>
+        <p><strong>Status:</strong> {{ order.status }}</p>
+      </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- ⚙️ SETTINGS -->
+    <!-- ========================= -->
+    <div *ngIf="activeTab === 'settings'" class="settings-section">
+
+      <label class="setting-item">
+        <input type="checkbox" [(ngModel)]="darkMode">
+        Dark Mode
+      </label>
+
+      <label class="setting-item">
+        <input type="checkbox" [(ngModel)]="notifications">
+        Notifications
+      </label>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- ACTION BUTTONS -->
+    <!-- ========================= -->
     <div class="profile-actions">
-      <button (click)="goBack()">⬅ Back</button>
-      <button class="logout" (click)="logout()">Logout</button>
+      <button type="button" class="back-btn" (click)="goBack()">⬅ Back</button>
+      <button type="button" class="logout" (click)="logout()">Logout</button>
     </div>
 
   </div>
+
+  <!-- ========================= -->
+  <!-- 🆘 HELP BUTTON -->
+  <!-- ========================= -->
+  <button class="help-btn" (click)="openHelp()">
+    💬 Help
+  </button>
 
 </div>

@@ -1,15 +1,8 @@
 package com.edutech.fooddeliverysystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.edutech.fooddeliverysystem.entity.Menu;
 import com.edutech.fooddeliverysystem.entity.Order;
@@ -22,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/restaurant")
+@CrossOrigin(origins = "*")
 public class RestaurantController {
 
     @Autowired
@@ -37,47 +31,53 @@ public class RestaurantController {
     public Restaurant createRestaurant(@RequestBody Restaurant restaurant) {
         return restaurantService.save(restaurant);
     }
-    
-    // ✅ NEW - GET ALL RESTAURANTS
+
     @GetMapping("/all")
     public List<Restaurant> getAllRestaurants() {
         return restaurantService.getAllRestaurants();
     }
 
+    // ✅ FIXED HERE
     @PostMapping("/menu")
     public Menu addMenu(@RequestParam Long restaurantId, @RequestBody Menu menu) {
         return menuService.addMenuItem(restaurantId, menu);
+    }
+
+    @GetMapping("/menu")
+    public List<Menu> getMenuByQuery(@RequestParam Long restaurantId) {
+        return menuService.getMenuByRestaurant(restaurantId);
+    }
+
+    @GetMapping("/menu/{restaurantId}")
+    public List<Menu> getMenu(@PathVariable Long restaurantId) {
+        return menuService.getMenuByRestaurant(restaurantId);
+    }
+
+    @PutMapping("/menu/{id}")
+    public Menu updateMenu(@PathVariable Long id, @RequestBody Menu menu) {
+        return menuService.updateMenuItem(id, menu);
+    }
+
+    @DeleteMapping("/menu/{id}")
+        public ResponseEntity<Void> deleteMenu(@PathVariable Long id) {
+        menuService.deleteMenuItem(id);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/order/update/{id}")
     public Order updateOrder(@PathVariable Long id, @RequestParam Order.Status status) {
         return orderService.updateOrderStatus(id, status);
     }
-    
-    @GetMapping("/menu")
-    public List<Menu> getMenu(@RequestParam Long restaurantId) {
-        return menuService.getMenuByRestaurant(restaurantId);
+
+    @PostMapping("/create-for-owner")
+    public Restaurant createRestaurantForOwner(
+            @RequestBody Restaurant restaurant,
+            @RequestParam String ownerEmail) {
+        return restaurantService.createRestaurantForOwner(restaurant, ownerEmail);
     }
 
-    @DeleteMapping("/menu/{id}")
-    public String deleteMenu(@PathVariable Long id) {
-        menuService.deleteMenuItem(id);
-        return "Deleted successfully";
+    @GetMapping("/my")
+    public Restaurant getMyRestaurant(@RequestParam Long userId) {
+        return restaurantService.getRestaurantByOwner(userId);
     }
-    
-    @PutMapping("/menu/{id}")
-    public Menu updateMenu(@PathVariable Long id, @RequestBody Menu menu) {
-        return menuService.updateMenuItem(id, menu);
-    }
-    // ADD THIS inside RestaurantController.java
-@PostMapping("/create-for-owner")
-public Restaurant createRestaurantForOwner(
-    @RequestBody Restaurant restaurant,
-    @RequestParam String ownerEmail) {
-    return restaurantService.createRestaurantForOwner(restaurant, ownerEmail);
-}
-@GetMapping("/my")
-public Restaurant getMyRestaurant(@RequestParam Long userId) {
-    return restaurantService.getRestaurantByOwner(userId);
-}
 }

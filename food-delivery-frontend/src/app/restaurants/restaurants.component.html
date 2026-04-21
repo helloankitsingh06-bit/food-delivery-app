@@ -1,33 +1,36 @@
 <div class="restaurants-container">
 
-  <!-- Navbar -->
+  <!-- NAVBAR -->
   <div class="glass-navbar">
 
-    <!-- LEFT -->
     <div class="nav-left">
       <div class="logo">
-        <span class="logo-icon">🍽️</span>
-        <span class="logo-text">FOOD<span class="gold">ELITE</span></span>
+        <span class="gold">FORKYEAH</span>
       </div>
 
-      <!-- LOCATION -->
       <div class="location-wrapper">
 
-        <!-- Selected Location -->
         <div class="location-display" (click)="toggleLocationDropdown($event)">
-          📍 <span class="location-text">{{ selectedLocation }}</span>
-          <span class="dropdown-arrow">▼</span>
+          📍 {{ selectedLocation }}
+           <span class="dropdown-arrow">▼</span>
         </div>
 
-        <!-- Dropdown -->
-        <div class="location-dropdown" *ngIf="showLocationDropdown" (click)="$event.stopPropagation()">
+        <div class="location-dropdown"
+             *ngIf="showLocationDropdown"
+             (click)="$event.stopPropagation()">
 
-          <div
-            class="location-item"
-            *ngFor="let loc of locations"
-            (click)="selectLocation(loc, $event)"
-          >
-            {{ loc }}
+          <div class="location-item"
+               *ngFor="let loc of locations; let i = index">
+
+            <span (click)="selectLocation(loc, $event)">
+              {{ loc }}
+            </span>
+
+            <div class="loc-actions">
+              <button (click)="editLocation(i, $event)">✏️</button>
+              <button (click)="deleteLocation(i, $event)">🗑️</button>
+            </div>
+
           </div>
 
           <div class="divider"></div>
@@ -37,10 +40,10 @@
           </div>
 
         </div>
+
       </div>
     </div>
 
-    <!-- RIGHT -->
     <div class="nav-right">
       <button class="profile-btn" (click)="goToProfile()">
         👤 Profile
@@ -49,8 +52,50 @@
 
   </div>
 
-  <!-- Hero Section -->
+  <!-- 🔥 SLIDER (SAFE VERSION) -->
+  <div class="hero-slider"
+       (mouseenter)="pauseSlider()"
+       (mouseleave)="resumeSlider()">
+
+    <div class="slide"
+         *ngFor="let slide of slides; let i = index"
+         [class.active]="i === currentSlide">
+
+      <!-- IMAGE -->
+      <img *ngIf="slide.type === 'image'"
+           class="slide-img"
+           [src]="slide.image" />
+
+      <!-- VIDEO -->
+      <video *ngIf="slide.type === 'video'"
+             class="slide-video"
+             [src]="slide.image"
+             autoplay muted loop playsinline>
+      </video>
+
+      <div class="slide-overlay glass">
+        <h2>{{ slide.title }}</h2>
+        <p>{{ slide.subtitle }}</p>
+      </div>
+
+    </div>
+
+    <!-- ARROWS -->
+    <button type="button" class="nav prev" (click)="prevSlide()">‹</button>
+    <button type="button" class="nav next" (click)="nextSlide()">›</button>
+
+    <!-- DOTS -->
+    <div class="slider-dots">
+      <span *ngFor="let s of slides; let i = index"
+            (click)="goToSlide(i)"
+            [class.active]="i === currentSlide"></span>
+    </div>
+
+  </div>
+
+  <!-- HERO -->
   <div class="hero-section">
+
     <h1 class="hero-title">
       <span class="gold-text">PREMIUM</span> DINING
       <span class="gold-text">EXPERIENCE</span>
@@ -61,64 +106,98 @@
     </p>
 
     <div class="search-container">
-      <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          placeholder="Search by restaurant name or cuisine..."
-          class="search-input">
-      </div>
+      <input type="text"
+             [(ngModel)]="searchTerm"
+             (input)="onSearch()"
+             placeholder="Search restaurants..."
+             class="search-input">
     </div>
+
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="loading-container">
-    <div class="loader"></div>
-    <p class="loading-text">Loading exclusive restaurants...</p>
+  <!-- LOADING -->
+  <div *ngIf="loading" class="skeleton-grid">
+    <div class="skeleton-card" *ngFor="let x of [1,2,3,4,5]"></div>
   </div>
 
-  <!-- Error -->
+  <!-- ERROR -->
   <div *ngIf="errorMessage" class="alert-error">
-    ⚠️ {{ errorMessage }}
+    {{ errorMessage }}
   </div>
 
-  <!-- Restaurants -->
-  <div class="restaurants-grid" *ngIf="!loading">
+  <!-- RESTAURANTS -->
+  <div class="restaurants-scroll" *ngIf="!loading">
+
     <div *ngFor="let restaurant of filteredRestaurants"
          class="restaurant-card"
          (click)="viewMenu(restaurant.id)">
 
       <div class="card-image">
-        <img [src]="restaurant.imageUrl || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'">
+        <img 
+          [src]="restaurant.imageUrl || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'"
+        >
       </div>
 
       <div class="card-content">
-        <h3>{{ restaurant.name }}</h3>
 
-        <div class="cuisine-section">
-          <span class="cuisine-tag">{{ restaurant.cuisine || 'Multi-Cuisine' }}</span>
+        <h3>{{ restaurant.name || 'Restaurant' }}</h3>
+
+        <div class="cuisine-tag">
+          {{ restaurant.cuisine || 'Multi-Cuisine' }}
         </div>
 
-        <p class="address">
-          📍 {{ restaurant.address || 'City Center' }}
-        </p>
+        <div class="card-footer">
+          <span class="address">
+            📍 {{ restaurant.address || 'City Center' }}
+          </span>
 
-        <div class="rating">
-          ⭐ {{ restaurant.rating || '4.5' }}
+          <span class="rating">
+            ⭐ {{ restaurant.rating || '4.5' }}
+          </span>
         </div>
 
-        <button class="btn-view-menu">
-          EXPLORE MENU →
-        </button>
+        
+
       </div>
+
     </div>
+
   </div>
 
-  <!-- No Results -->
-  <div *ngIf="filteredRestaurants.length === 0 && !loading && !errorMessage" class="no-results">
-    <h3>No Results Found</h3>
-    <p>Restaurants will be shown here</p>
+  <!-- NO RESULTS -->
+  <div *ngIf="!loading && filteredRestaurants?.length === 0"
+       class="no-results">
+    No restaurants found
+  </div>
+
+  <!-- POPUP -->
+  <div class="cart-popup" *ngIf="showPopup">
+    Item added to cart
+  </div>
+
+  <!-- FLOATING CART -->
+  <div class="floating-cart" (click)="toggleCart()">
+    🛒 {{ cart?.length || 0 }}
+  </div>
+
+  <!-- CART PANEL -->
+  <div class="cart-panel" *ngIf="showCart">
+
+    <h3>Your Cart</h3>
+
+    <div *ngIf="!cart || cart.length === 0">
+      Cart is empty
+    </div>
+
+    <div *ngFor="let item of cart">
+      <p>{{ item.name }} x {{ item.qty }}</p>
+      <span>₹{{ item.price * item.qty }}</span>
+    </div>
+
+    <h4>Total: ₹{{ getTotal() }}</h4>
+
+    <button class="checkout-btn">Checkout</button>
+
   </div>
 
 </div>
