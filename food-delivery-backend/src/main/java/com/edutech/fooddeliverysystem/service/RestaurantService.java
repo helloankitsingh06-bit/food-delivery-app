@@ -31,22 +31,23 @@ public class RestaurantService {
         return restaurantRepository.save(restaurant);
     }
     
-    // ✅ ADD THIS - Create restaurant for logged-in owner
+    // ✅ Create restaurant for logged-in owner (USING EMAIL)
     public Restaurant createRestaurantForOwner(Restaurant restaurant, String ownerEmail) {
         User owner = userRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new RuntimeException("Owner not found"));
+            .orElseThrow(() -> new RuntimeException("Owner not found with email: " + ownerEmail));
         restaurant.setOwner(owner);
         return restaurantRepository.save(restaurant);
     }
     
-    // ✅ ADD THIS - Get restaurants by owner
+    // ✅ Get restaurants by owner email
     public List<Restaurant> getRestaurantsByOwner(String ownerEmail) {
         User owner = userRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new RuntimeException("Owner not found"));
+            .orElseThrow(() -> new RuntimeException("Owner not found with email: " + ownerEmail));
         return restaurantRepository.findByOwner(owner);
     }
+    
     public Restaurant getRestaurantByOwner(Long userId) {
-    return restaurantRepository.findByOwnerId(userId)
+        return restaurantRepository.findByOwnerId(userId)
             .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-}
+    }
 }

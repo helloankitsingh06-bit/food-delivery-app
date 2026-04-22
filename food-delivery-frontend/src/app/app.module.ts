@@ -15,8 +15,7 @@ import { RestaurantsComponent } from './restaurants/restaurants.component';
 import { MenuComponent } from './menu/menu.component';
 import { OrdersComponent } from './orders/orders.component';
 import { DeliveryComponent } from './delivery/delivery.component';
-
-
+import { CreateRestaurantComponent } from './create-restaurant/create-restaurant.component';
 
 // ✅ ROUTES (OPTIMIZED)
 const routes: Routes = [
@@ -30,6 +29,12 @@ const routes: Routes = [
 
   // Main App
   { path: 'restaurants', component: RestaurantsComponent, canActivate: [AuthGuard] },
+  { 
+    path: 'create-restaurant', 
+    component: CreateRestaurantComponent, 
+    canActivate: [AuthGuard],
+    data: { role: 'RESTAURANT' }
+  },
 
   { path: 'menu', component: MenuComponent, canActivate: [AuthGuard] },
   { path: 'menu/:id', component: MenuComponent, canActivate: [AuthGuard] },
@@ -67,7 +72,8 @@ const routes: Routes = [
     RestaurantsComponent,
     MenuComponent,
     OrdersComponent,
-    DeliveryComponent
+    DeliveryComponent,
+    CreateRestaurantComponent
     // ❌ DO NOT ADD standalone components here
   ],
 

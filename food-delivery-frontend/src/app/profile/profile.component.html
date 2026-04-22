@@ -1,129 +1,178 @@
 <div class="profile-container">
 
-  <div class="profile-card">
+  <!-- HEADER -->
+  <div class="profile-header fade-in">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <h1>{{ displayName }}'s Profile</h1>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
 
-    <!-- HEADER -->
-    <div class="profile-header">
-      <div class="avatar">👤</div>
-      <h2>{{ user?.name || 'User' }}</h2>
-      <p>{{ user?.email || 'No email available' }}</p>
+  <!-- LOADING -->
+  <div *ngIf="isLoading" class="loading-card fade-in">
+    Loading profile...
+  </div>
+
+  <!-- MAIN -->
+  <div *ngIf="!isLoading" class="profile-card slide-up">
+    
+    <div *ngIf="successMessage" class="success-message fade-in">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error-message fade-in">{{ errorMessage }}</div>
+
+    <!-- ACCOUNT -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Account Information</h2>
+        <button *ngIf="user.role !== 'RESTAURANT' && !isEditing" class="edit-btn" (click)="toggleEdit()">✏️ Edit</button>
+      </div>
+      
+      <div class="info-card hover-glow">
+        <div class="info-row">
+          <span>👤 Name</span>
+          <div *ngIf="!isEditing || user.role === 'RESTAURANT'" class="value">{{ user.name }}</div>
+          <input *ngIf="isEditing && user.role !== 'RESTAURANT'" [(ngModel)]="userForm.name" class="edit-input">
+        </div>
+        
+        <div class="info-row">
+          <span>📧 Email</span>
+          <div class="value">{{ user.email }}</div>
+        </div>
+
+        <div class="info-row" *ngIf="user.role !== 'RESTAURANT'">
+          <span>📞 Phone</span>
+          <div *ngIf="!isEditing" class="value">{{ user.phone || 'Not set' }}</div>
+          <input *ngIf="isEditing" [(ngModel)]="userForm.phone" class="edit-input">
+        </div>
+
+        <div class="info-row" *ngIf="user.role !== 'RESTAURANT'">
+          <span>📍 Address</span>
+          <div *ngIf="!isEditing" class="value">{{ user.address || 'Not set' }}</div>
+          <textarea *ngIf="isEditing" [(ngModel)]="userForm.address" class="edit-textarea"></textarea>
+        </div>
+        
+        <div class="info-row">
+          <span>Role</span>
+          <div class="value">
+            <span class="role-badge"
+              [class.customer]="user.role === 'CUSTOMER'"
+              [class.restaurant]="user.role === 'RESTAURANT'"
+              [class.delivery]="user.role === 'DELIVERY'">
+              {{ user.role }}
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="isEditing && user.role !== 'RESTAURANT'" class="action-buttons">
+          <button class="save-btn" (click)="updateCustomerProfile()">Save</button>
+          <button class="cancel-btn" (click)="toggleEdit()">Cancel</button>
+        </div>
+      </div>
     </div>
 
-    <!-- 🔥 TAB SWITCH -->
-    <div class="profile-tabs">
-      <button 
-        type="button"
-        (click)="setTab('profile')" 
-        [class.active]="activeTab === 'profile'">
-        👤 Profile
-      </button>
-
-      <button 
-        type="button"
-        (click)="setTab('orders')" 
-        [class.active]="activeTab === 'orders'">
-        🧾 Orders
-      </button>
-
-      <button 
-        type="button"
-        (click)="setTab('settings')" 
-        [class.active]="activeTab === 'settings'">
-        ⚙️ Settings
-      </button>
-    </div>
-
-    <!-- ========================= -->
-    <!-- 👤 PROFILE (EDITABLE) -->
-    <!-- ========================= -->
-    <div *ngIf="activeTab === 'profile'" class="profile-details">
-
-      <!-- NAME -->
-      <div class="detail">
-        <span>👤 Name</span>
-        <input [(ngModel)]="user.name" [readonly]="!editMode">
+    <!-- RESTAURANT -->
+    <div *ngIf="user.role === 'RESTAURANT'" class="section">
+      <div class="section-header">
+        <h2>Restaurant Information</h2>
+        <button *ngIf="restaurant && !isEditing" class="edit-btn" (click)="toggleEdit()">✏️ Edit</button>
       </div>
 
-      <!-- PHONE -->
-      <div class="detail">
-        <span>📞 Phone</span>
-        <input [(ngModel)]="user.phone" [readonly]="!editMode">
+      <!-- NO RESTAURANT -->
+      <div *ngIf="!restaurant" class="info-card fade-in">
+        <p class="no-restaurant">⚠️ No restaurant found</p>
       </div>
 
-      <!-- ADDRESS -->
-      <div class="detail">
-        <span>📍 Address</span>
-        <input [(ngModel)]="user.address" [readonly]="!editMode">
+      <!-- VIEW MODE -->
+      <div *ngIf="restaurant && !isEditing" class="info-card hover-glow">
+        
+        <div class="info-row">
+          <span>🍽 Name</span>
+          <div class="value highlight">{{ restaurant.name }}</div>
+        </div>
+
+        <div class="info-row">
+          <span>🍜 Cuisine Type</span>
+          <div class="value">{{ restaurant.cuisine || 'Not set' }}</div>
+        </div>
+
+        <div class="info-row">
+          <span>📍 Location/City</span>
+          <div class="value">{{ restaurant.location || 'Not set' }}</div>
+        </div>
+
+        <div class="info-row">
+          <span>🏠 Address</span>
+          <div class="value">{{ restaurant.address || 'Not set' }}</div>
+        </div>
+
+        <div class="info-row">
+          <span>⭐ Rating (0-5)</span>
+          <div class="value">{{ restaurant.rating || 0 }}</div>
+        </div>
+
+        <div class="info-row" *ngIf="restaurant.imageUrl">
+          <span>🖼 Image</span>
+          <div class="value">
+            <img [src]="restaurant.imageUrl" class="restaurant-image">
+          </div>
+        </div>
+
+        <!-- ✅ ADDED -->
+        <div class="info-row">
+          <span>📧 Owner Email</span>
+          <div class="value">{{ user.email }}</div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="delete-btn" (click)="deleteRestaurant()">Delete</button>
+        </div>
       </div>
 
-      <!-- 🔥 EDIT ACTIONS -->
-      <div class="edit-actions">
+      <!-- EDIT MODE -->
+      <div *ngIf="restaurant && isEditing" class="info-card edit-mode slide-up">
+        <h3>Edit Restaurant</h3>
+        
+        <div class="info-row">
+          <span>Name</span>
+          <input [(ngModel)]="restaurantForm.name" class="edit-input">
+        </div>
 
-        <button *ngIf="!editMode" (click)="enableEdit()">
-          ✏️ Edit
-        </button>
+        <div class="info-row">
+          <span>Cuisine Type</span>
+          <input [(ngModel)]="restaurantForm.cuisine" class="edit-input">
+        </div>
 
-        <button *ngIf="editMode" (click)="saveProfile()">
-          💾 Save
-        </button>
+        <div class="info-row">
+          <span>Location/City</span>
+          <input [(ngModel)]="restaurantForm.location" class="edit-input">
+        </div>
 
-        <button *ngIf="editMode" (click)="cancelEdit()">
-          ❌ Cancel
-        </button>
+        <div class="info-row">
+          <span>Address</span>
+          <textarea [(ngModel)]="restaurantForm.address" class="edit-textarea"></textarea>
+        </div>
 
+        <div class="info-row">
+          <span>Rating (0-5)</span>
+          <input [(ngModel)]="restaurantForm.rating" type="number" min="0" max="5" class="edit-input">
+        </div>
+
+        <div class="info-row">
+          <span>Image URL</span>
+          <input [(ngModel)]="restaurantForm.imageUrl" class="edit-input">
+        </div>
+
+        <!-- ✅ ADDED -->
+        <div class="info-row">
+          <span>Owner Email</span>
+          <input [value]="user.email" class="edit-input" disabled>
+        </div>
+
+        <div class="action-buttons">
+          <button class="save-btn" (click)="updateRestaurantProfile()">Save</button>
+          <button class="cancel-btn" (click)="toggleEdit()">Cancel</button>
+        </div>
       </div>
 
-    </div>
-
-    <!-- ========================= -->
-    <!-- 🧾 ORDERS -->
-    <!-- ========================= -->
-    <div *ngIf="activeTab === 'orders'" class="orders-section">
-
-      <p *ngIf="orders.length === 0" class="empty-state">
-        No orders yet 🍽️
-      </p>
-
-      <div *ngFor="let order of orders" class="order-card">
-        <p><strong>ID:</strong> {{ order.id }}</p>
-        <p><strong>Total:</strong> ₹{{ order.total }}</p>
-        <p><strong>Status:</strong> {{ order.status }}</p>
-      </div>
-
-    </div>
-
-    <!-- ========================= -->
-    <!-- ⚙️ SETTINGS -->
-    <!-- ========================= -->
-    <div *ngIf="activeTab === 'settings'" class="settings-section">
-
-      <label class="setting-item">
-        <input type="checkbox" [(ngModel)]="darkMode">
-        Dark Mode
-      </label>
-
-      <label class="setting-item">
-        <input type="checkbox" [(ngModel)]="notifications">
-        Notifications
-      </label>
-
-    </div>
-
-    <!-- ========================= -->
-    <!-- ACTION BUTTONS -->
-    <!-- ========================= -->
-    <div class="profile-actions">
-      <button type="button" class="back-btn" (click)="goBack()">⬅ Back</button>
-      <button type="button" class="logout" (click)="logout()">Logout</button>
     </div>
 
   </div>
-
-  <!-- ========================= -->
-  <!-- 🆘 HELP BUTTON -->
-  <!-- ========================= -->
-  <button class="help-btn" (click)="openHelp()">
-    💬 Help
-  </button>
-
 </div>

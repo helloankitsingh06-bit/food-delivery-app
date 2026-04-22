@@ -60,13 +60,22 @@ export class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
+  // ✅ getCurrentUser() method - Fetches user from 'user' key in localStorage
+  getCurrentUser(): any {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      return JSON.parse(userStr);
+    }
+    return null;
+  }
+
   getUserRole(): string {
-    const user = this.getUser();
+    const user = this.getCurrentUser();
     return user ? user.role : '';
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!localStorage.getItem('token');
   }
 
   getLoggedInStatus(): Observable<boolean> {
@@ -76,8 +85,8 @@ export class AuthService {
   getUserRoleObservable(): Observable<string> {
     return this.userRoleSubject.asObservable();
   }
-  private hasToken(): boolean 
-  {
+  
+  private hasToken(): boolean {
     return !!localStorage.getItem(this.tokenKey);
   }
 }

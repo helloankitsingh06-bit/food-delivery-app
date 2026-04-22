@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +11,7 @@
 </head>
 <body>
   <div class="orders-container">
-    <!-- Header -->
+    <!-- Header - UPDATED WITH DISPLAY NAME -->
     <div class="header">
       <div class="header-left">
         <button class="menu-toggle" (click)="toggleSidebar()">
@@ -20,8 +19,8 @@
         </button>
         
         <h1>
-          <span *ngIf="userRole === 'CUSTOMER'">My Orders</span>
-          <span *ngIf="userRole === 'RESTAURANT'">Restaurant Orders</span>
+          <span *ngIf="userRole === 'CUSTOMER'">{{ displayName }}'s Orders</span>
+          <span *ngIf="userRole === 'RESTAURANT'">{{ displayName }} Orders</span>
           <span *ngIf="userRole === 'DELIVERY'">Delivery Assignments</span>
         </h1>
       </div>
@@ -70,34 +69,28 @@
           </div>
         </div>
 
-        <!-- User Profile -->
+        <!-- User Profile - UPDATED TO SHOW RESTAURANT NAME -->
         <div class="user-profile" (click)="toggleProfileMenu()">
           <img [src]="userAvatar || 'assets/default-avatar.png'" alt="Profile">
-          <span>{{ userName }}</span>
+          <span>{{ userRole === 'RESTAURANT' ? (restaurantName || displayName) : displayName }}</span>
           <i class="fas fa-chevron-down"></i>
 
           <!-- Profile Dropdown -->
           <div class="profile-dropdown" *ngIf="showProfileMenu">
-
-  <button (click)="goToOrders(); showProfileMenu=false">
-    <i class="fas fa-box"></i> Orders
-  </button>
-
-  <button (click)="goToMenu(); showProfileMenu=false">
-    <i class="fas fa-utensils"></i> Menu
-  </button>
-
-  <button (click)="goToProfile(); showProfileMenu=false">
-    <i class="fas fa-user"></i> Profile
-  </button>
-
-  <hr>
-
-  <button (click)="logout()">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
-
-</div>
+            <button (click)="goToOrders(); showProfileMenu=false">
+              <i class="fas fa-box"></i> Orders
+            </button>
+            <button (click)="goToMenu(); showProfileMenu=false">
+              <i class="fas fa-utensils"></i> Menu
+            </button>
+            <button (click)="goToProfile(); showProfileMenu=false">
+              <i class="fas fa-user"></i> Profile
+            </button>
+            <hr>
+            <button (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -175,25 +168,6 @@
       </div>
     </div>
 
-    <h2>Menu Items</h2>
-
-<div *ngFor="let item of menuItems">
-
-  <!-- NORMAL VIEW -->
-  <div *ngIf="editItem?.id !== item.id">
-    <p>{{item.name}} - ₹{{item.price}}</p>
-    <button (click)="startEdit(item)">Edit</button>
-    <button (click)="deleteMenu(item.id)">Delete</button>
-  </div>
-
-  <!-- EDIT MODE -->
-  <div *ngIf="editItem?.id === item.id">
-    <input [(ngModel)]="editName" placeholder="Name">
-    <input [(ngModel)]="editPrice" type="number" placeholder="Price">
-    <button (click)="saveEdit()">Save</button>
-  </div>
-
-</div>
     <!-- Quick Actions Bar -->
     <div class="quick-actions">
       <button class="action-btn" *ngIf="userRole === 'CUSTOMER'" (click)="navigateToRestaurants()">
@@ -493,195 +467,5 @@
       </div>
     </div>
   </div>
-
-  <script>
-    // Mock data and functions for preview
-    // This would be replaced by your actual Angular component logic
-    const mockData = {
-      userRole: 'CUSTOMER', // Try 'CUSTOMER', 'RESTAURANT', or 'DELIVERY'
-      userName: 'John Doe',
-      userAvatar: 'https://i.pravatar.cc/150?img=3',
-      notificationCount: 3,
-      showNotifications: false,
-      showProfileMenu: false,
-      totalOrders: 24,
-      activeOrders: 3,
-      activeOrdersCount: 3,
-      pastOrdersCount: 20,
-      cancelledOrdersCount: 1,
-      savedAddresses: ['Home', 'Work'],
-      todayRevenue: 12500,
-      pendingOrders: 5,
-      completedDeliveries: 8,
-      todayEarnings: 850,
-      isOnline: true,
-      loading: false,
-      errorMessage: '',
-      searchTerm: '',
-      statusFilter: 'ALL',
-      dateFilter: 'ALL',
-      activeTab: 'active',
-      showRatingModal: false,
-      showHelpModal: false,
-      ratingValue: 0,
-      hoverRating: 0,
-      ratingFeedback: '',
-      issueType: '',
-      issueDescription: '',
-      selectedOrder: null,
-      orderStatuses: ['PLACED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'],
-
-      notifications: [
-        { type: 'success', message: 'Your order #ORD-123 has been delivered!', time: new Date() },
-        { type: 'update', message: 'Restaurant is preparing your order #ORD-124', time: new Date() },
-        { type: 'update', message: 'Delivery partner assigned to order #ORD-122', time: new Date() }
-      ],
-
-      orders: [
-        {
-          id: 'ORD-12345',
-          restaurantId: 'REST-001',
-          restaurantName: 'Golden Dragon',
-          restaurantImage: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=100&h=100&fit=crop',
-          restaurantRating: '4.5',
-          ratingCount: '250+',
-          items: ['Kung Pao Chicken', 'Fried Rice', 'Spring Rolls'],
-          totalPrice: 1250,
-          orderDate: new Date(),
-          deliveryAddress: '123 Main Street, Andheri East, Mumbai',
-          estimatedDeliveryTime: '25-30 mins',
-          status: 'PREPARING',
-          orderType: 'DELIVERY',
-          paymentMethod: 'Online Payment',
-          isFavorite: true,
-          deliveryPartner: {
-            id: 'DP-001',
-            name: 'Rajesh Kumar',
-            avatar: 'https://i.pravatar.cc/150?img=7',
-            vehicle: 'Honda Activa • MH 02 AB 1234'
-          }
-        },
-        {
-          id: 'ORD-67890',
-          restaurantId: 'REST-002',
-          restaurantName: 'Pizza Palace',
-          restaurantImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=100&h=100&fit=crop',
-          restaurantRating: '4.2',
-          ratingCount: '180+',
-          items: ['Margherita Pizza', 'Garlic Bread', 'Coke'],
-          totalPrice: 850,
-          orderDate: new Date(Date.now() - 86400000),
-          deliveryAddress: '456 Park Avenue, Bandra West, Mumbai',
-          status: 'DELIVERED',
-          orderType: 'DELIVERY',
-          paymentMethod: 'Cash on Delivery',
-          isFavorite: false
-        },
-        {
-          id: 'ORD-24680',
-          restaurantId: 'REST-003',
-          restaurantName: 'Spice Garden',
-          restaurantImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100&h=100&fit=crop',
-          restaurantRating: '4.7',
-          ratingCount: '320+',
-          items: ['Butter Chicken', 'Naan', 'Jeera Rice', 'Gulab Jamun'],
-          totalPrice: 1650,
-          orderDate: new Date(),
-          deliveryAddress: '789 Linking Road, Juhu, Mumbai',
-          estimatedDeliveryTime: '35-40 mins',
-          status: 'OUT_FOR_DELIVERY',
-          orderType: 'DELIVERY',
-          paymentMethod: 'UPI Payment',
-          isFavorite: true,
-          deliveryPartner: {
-            id: 'DP-002',
-            name: 'Priya Sharma',
-            avatar: 'https://i.pravatar.cc/150?img=5',
-            vehicle: 'TVS Jupiter • MH 03 CD 5678'
-          }
-        }
-      ],
-
-      filteredOrders: [],
-
-      getStatusColor(status) {
-        const colors = {
-          'PLACED': '#f39c12',
-          'PREPARING': '#3498db',
-          'READY': '#2ecc71',
-          'OUT_FOR_DELIVERY': '#9b59b6',
-          'DELIVERED': '#27ae60',
-          'CANCELLED': '#e74c3c'
-        };
-        return colors[status] || '#95a5a6';
-      },
-
-      canCancelOrder(status) {
-        return ['PLACED', 'PREPARING'].includes(status);
-      },
-
-      getEstimatedDeliveryTime() {
-        return '15-20 minutes';
-      },
-
-      // Mock functions
-      toggleSidebar() { console.log('Toggle sidebar'); },
-      toggleNotifications() { this.showNotifications = !this.showNotifications; },
-      toggleProfileMenu() { this.showProfileMenu = !this.showProfileMenu; },
-      toggleOnlineStatus() { this.isOnline = !this.isOnline; },
-      filterOrders() {
-        this.filteredOrders = this.orders.filter(o => {
-          if (this.statusFilter !== 'ALL' && o.status !== this.statusFilter) return false;
-          if (this.activeTab === 'active' && ['DELIVERED', 'CANCELLED'].includes(o.status)) return false;
-          if (this.activeTab === 'past' && o.status !== 'DELIVERED') return false;
-          if (this.activeTab === 'cancelled' && o.status !== 'CANCELLED') return false;
-          return true;
-        });
-      },
-      trackOrder(id) {
-        this.selectedOrder = this.orders.find(o => o.id === id);
-        console.log('Track order:', id);
-      },
-      closeTracking() { this.selectedOrder = null; },
-      reorderItems(id) { console.log('Reorder:', id); },
-      rateOrder(order) {
-        this.selectedOrder = order;
-        this.showRatingModal = true;
-      },
-      closeRatingModal() { this.showRatingModal = false; },
-      submitRating() {
-        console.log('Rating submitted:', this.ratingValue, this.ratingFeedback);
-        this.closeRatingModal();
-      },
-      reportIssue(id) {
-        this.selectedOrder = this.orders.find(o => o.id === id);
-        this.showHelpModal = true;
-      },
-      closeHelpModal() { this.showHelpModal = false; },
-      submitIssue() {
-        console.log('Issue reported:', this.issueType, this.issueDescription);
-        this.closeHelpModal();
-      },
-      cancelOrder(id) { console.log('Cancel order:', id); },
-      downloadReceipt(id) { console.log('Download receipt:', id); },
-      toggleFavorite(restaurantId) {
-        const order = this.orders.find(o => o.restaurantId === restaurantId);
-        if (order) order.isFavorite = !order.isFavorite;
-      },
-      contactDeliveryPartner(id) { console.log('Contact partner:', id); },
-      trackLiveLocation(id) { console.log('Track location:', id); },
-      navigateToRestaurants() { console.log('Navigate to restaurants'); },
-      openSupportChat() { console.log('Open support chat'); },
-      markAllRead() { this.notifications = []; this.notificationCount = 0; },
-      logout() { console.log('Logout'); }
-    };
-
-    // Initialize
-    mockData.filteredOrders = mockData.orders;
-
-    // For demo purposes, attach to window
-    window.demo = mockData;
-  </script>
 </body>
 </html>
-<button (click)="addTestItem()">Add Test Menu</button>

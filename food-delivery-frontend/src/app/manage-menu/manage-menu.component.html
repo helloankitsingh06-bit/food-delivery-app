@@ -1,50 +1,121 @@
-<h2>Manage Menu</h2>
+<div class="page-wrapper">
 
-<form (ngSubmit)="addItem()" #menuForm="ngForm">
+  <h2>Manage Menu</h2>
 
-<label>Food Name:</label><br>
-<input type="text" name="name" [(ngModel)]="menuItem.name" required><br><br>
+  <!-- REMOVED ngForm to eliminate validation blocking -->
+  <div class="menu-form">
 
-<label>Price:</label><br>
-<input type="number" name="price" [(ngModel)]="menuItem.price" required><br><br>
+    <div class="form-grid">
 
-<label>Description:</label><br>
-<textarea name="description" [(ngModel)]="menuItem.description"></textarea><br><br>
-
-<label>Quantity Available:</label><br>
-<input type="number" name="quantity" [(ngModel)]="menuItem.quantity"><br><br>
-
-<label>Food Image:</label><br>
-<input type="file" (change)="onFileSelected($event)"><br><br>
-
-<button type="submit">
-  {{ isEditing ? 'Update Item' : 'Add Item' }}
-</button>
-
-</form>
-
-<hr>
-
-<h3>Menu Items</h3>
-
-<div class="menu-container">
-  <div class="menu-card" *ngFor="let item of menuList">
-
-    <img *ngIf="item.imageUrl"
-         [src]="item.imageUrl"
-         class="food-img">
-
-    <div class="card-content">
-      <h4>{{item.name}}</h4>
-      <p class="price">₹{{item.price}}</p>
-      <p>{{item.description}}</p>
-      <p class="qty">Available: {{item.quantity}}</p>
-
-      <div class="actions">
-        <button type="button" (click)="editItem(item)">✏️ Edit</button>
-        <button type="button" (click)="deleteItem(item.id)">🗑️ Delete</button>
+      <div class="form-group">
+        <label>Food Name *</label>
+        <input
+          type="text"
+          name="name"
+          [(ngModel)]="menuItem.name"
+          placeholder="Enter food name"
+        >
       </div>
+
+      <div class="form-group">
+        <label>Price *</label>
+        <input
+          type="number"
+          name="price"
+          [(ngModel)]="menuItem.price"
+          placeholder="Enter price"
+        >
+      </div>
+
+      <div class="form-group full-width">
+        <label>Description</label>
+        <textarea
+          name="description"
+          [(ngModel)]="menuItem.description"
+          placeholder="Enter food description"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Quantity Available</label>
+        <input
+          type="number"
+          name="quantity"
+          [(ngModel)]="menuItem.quantity"
+          placeholder="Available quantity"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Food Image</label>
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+        >
+      </div>
+
     </div>
 
+    <!-- SUCCESS/ERROR MESSAGES -->
+    <div *ngIf="successMessage" class="success-msg">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="error-msg">
+      {{ errorMessage }}
+    </div>
+
+    <!-- BUTTON - Removed from form, using (click) directly -->
+    <button type="button" class="submit-btn" (click)="addItem()">
+      {{ isEditing ? 'Update Item' : 'Add Item' }}
+    </button>
+
   </div>
+
+  <h3>Menu Items</h3>
+
+  <!-- LOADING STATE -->
+  <div *ngIf="isLoading" class="loading">
+    Loading menu items...
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="!isLoading && menuList.length === 0" class="empty-state">
+    No menu items found. Add your first menu item above!
+  </div>
+
+  <!-- MENU LIST -->
+  <div class="menu-container">
+    <div class="menu-card" *ngFor="let item of menuList">
+
+      <!-- ✅ IMPROVED: Image container with proper structure -->
+      <div class="food-image-container">
+        <img *ngIf="item.imageUrl" 
+             [src]="'http://localhost:8080/images/' + item.imageUrl" 
+             class="food-img"
+             (error)="item.imageUrl = null">
+        <div *ngIf="!item.imageUrl" class="no-image-placeholder">
+          🍽️
+        </div>
+      </div>
+
+      <div class="card-content">
+        <h4>{{item.name}}</h4>
+        <p class="price">₹{{item.price}}</p>
+        <p>{{item.description}}</p>
+        <p class="qty">Available: {{item.quantity}}</p>
+
+        <div class="actions">
+          <button type="button" class="edit-btn" (click)="editItem(item)">
+            ✏ Edit
+          </button>
+
+          <button type="button" class="delete-btn" (click)="deleteItem(item.id)">
+            🗑 Delete
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>

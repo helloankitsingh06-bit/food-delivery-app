@@ -11,7 +11,7 @@ export class RegistrationComponent {
 
   userData = {
     username: '',
-    name: '',        // ✅ added
+    name: '',
     password: '',
     email: '',
     role: 'CUSTOMER'
@@ -23,11 +23,12 @@ export class RegistrationComponent {
   errorMessage = '';
   loading = false;
 
-  constructor(private httpService: HttpService, private router: Router) {}
+  constructor(
+    private httpService: HttpService,
+    private router: Router
+  ) {}
 
   onSubmit(): void {
-
-    // 🔥 DEBUG LINE (VERY IMPORTANT)
     console.log("FORM DATA:", this.userData);
 
     this.loading = true;

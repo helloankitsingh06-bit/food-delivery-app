@@ -1,103 +1,101 @@
 <div class="restaurants-container">
 
-  <!-- NAVBAR -->
+  <!-- ================= NAVBAR ================= -->
   <div class="glass-navbar">
 
     <div class="nav-left">
-      <div class="logo">
-        <span class="gold">FORKYEAH</span>
-      </div>
-
-      <div class="location-wrapper">
+      <div class="logo-group">
+        <span class="logo-text">FORKIT</span>
 
         <div class="location-display" (click)="toggleLocationDropdown($event)">
-          📍 {{ selectedLocation }}
-           <span class="dropdown-arrow">▼</span>
+          📍 {{ selectedLocation || 'Select Location' }}
+          <span class="dropdown-arrow">▼</span>
+        </div>
+      </div>
+
+      <!-- DROPDOWN -->
+      <div class="location-dropdown"
+           *ngIf="showLocationDropdown"
+           (click)="$event.stopPropagation()">
+
+        <div class="location-item"
+             *ngFor="let loc of locations; let i = index"
+             [class.active]="loc === selectedLocation">
+
+          <span (click)="selectLocation(loc, $event)">
+            {{ loc }}
+          </span>
+
+          <div class="loc-actions">
+            <button class="icon-btn edit" (click)="editLocation(i, $event)">✎</button>
+            <button class="icon-btn delete" (click)="deleteLocation(i, $event)">🗑</button>
+          </div>
+
         </div>
 
-        <div class="location-dropdown"
-             *ngIf="showLocationDropdown"
-             (click)="$event.stopPropagation()">
+        <div class="divider"></div>
 
-          <div class="location-item"
-               *ngFor="let loc of locations; let i = index">
-
-            <span (click)="selectLocation(loc, $event)">
-              {{ loc }}
-            </span>
-
-            <div class="loc-actions">
-              <button (click)="editLocation(i, $event)">✏️</button>
-              <button (click)="deleteLocation(i, $event)">🗑️</button>
-            </div>
-
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="add-location" (click)="addLocation()">
-            ➕ Add Address
-          </div>
-
+        <div class="add-location" (click)="addLocation()">
+          ➕ Add Address
         </div>
 
       </div>
     </div>
 
     <div class="nav-right">
+      <button *ngIf="isRestaurantOwner()" class="create-resto-btn" (click)="goToCreateRestaurant()">
+        🍽️ Add Restaurant
+      </button>
       <button class="profile-btn" (click)="goToProfile()">
-        👤 Profile
+        <i class="fa-solid fa-user"></i>
+        Profile
       </button>
     </div>
 
   </div>
 
-  <!-- 🔥 SLIDER (SAFE VERSION) -->
+  <!-- ================= HERO SLIDER ================= -->
   <div class="hero-slider"
+       *ngIf="slides?.length"
        (mouseenter)="pauseSlider()"
        (mouseleave)="resumeSlider()">
 
     <div class="slide"
-         *ngFor="let slide of slides; let i = index"
+         *ngFor="let slide of slides; let i = index; trackBy: trackByIndex"
          [class.active]="i === currentSlide">
 
-      <!-- IMAGE -->
-      <img *ngIf="slide.type === 'image'"
-           class="slide-img"
-           [src]="slide.image" />
+      <img
+        class="slide-img"
+        [src]="slide.image"
+        alt="slider image"
+        loading="eager"
+        (error)="slide.image='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80'"
+      />
 
-      <!-- VIDEO -->
-      <video *ngIf="slide.type === 'video'"
-             class="slide-video"
-             [src]="slide.image"
-             autoplay muted loop playsinline>
-      </video>
-
-      <div class="slide-overlay glass">
+      <div class="slide-overlay">
         <h2>{{ slide.title }}</h2>
         <p>{{ slide.subtitle }}</p>
       </div>
 
     </div>
 
-    <!-- ARROWS -->
-    <button type="button" class="nav prev" (click)="prevSlide()">‹</button>
-    <button type="button" class="nav next" (click)="nextSlide()">›</button>
+    <button class="nav prev" (click)="prevSlide()">‹</button>
+    <button class="nav next" (click)="nextSlide()">›</button>
 
-    <!-- DOTS -->
     <div class="slider-dots">
-      <span *ngFor="let s of slides; let i = index"
+      <span *ngFor="let s of slides; let i = index; trackBy: trackByIndex"
             (click)="goToSlide(i)"
-            [class.active]="i === currentSlide"></span>
+            [class.active]="i === currentSlide">
+      </span>
     </div>
 
   </div>
 
-  <!-- HERO -->
+  <!-- ================= HERO ================= -->
   <div class="hero-section">
 
     <h1 class="hero-title">
-      <span class="gold-text">PREMIUM</span> DINING
+      <span class="gold-text">PREMIUM</span> DELIVERY
       <span class="gold-text">EXPERIENCE</span>
     </h1>
 
@@ -115,27 +113,88 @@
 
   </div>
 
-  <!-- LOADING -->
+  <!-- ================= FILTER ================= -->
+  <div class="filters-bar">
+
+    <div class="filters-left">
+
+      <button class="chip" (click)="toggleFilter()">
+        ⚙ Filters
+      </button>
+
+      <!-- 🔥 FIX: apply filter instantly -->
+      <button class="chip"
+              [class.active]="filters.highRating"
+              (click)="toggleQuickFilter('rating')">
+        ⭐ 4+
+      </button>
+
+      <button class="chip"
+              [class.active]="filters.lowPrice"
+              (click)="toggleQuickFilter('price')">
+        💰 Budget
+      </button>
+
+    </div>
+
+    <div class="filters-right">
+      <select class="sort-dropdown" (change)="sortRestaurants($event)">
+        <option value="">Sort</option>
+        <option value="low">₹ Low → High</option>
+        <option value="high">₹ High → Low</option>
+        <option value="rating">⭐ Rating</option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- FILTER PANEL -->
+  <div class="filter-panel" *ngIf="showFilter">
+    <label>
+      <input type="checkbox" [(ngModel)]="filters.highRating">
+      Rating 4+
+    </label>
+
+    <label>
+      <input type="checkbox" [(ngModel)]="filters.lowPrice">
+      Budget Friendly
+    </label>
+
+    <button (click)="applyFilters()">Apply</button>
+  </div>
+
+  <!-- ================= LOADING ================= -->
   <div *ngIf="loading" class="skeleton-grid">
     <div class="skeleton-card" *ngFor="let x of [1,2,3,4,5]"></div>
   </div>
 
-  <!-- ERROR -->
+  <!-- ================= ERROR ================= -->
   <div *ngIf="errorMessage" class="alert-error">
     {{ errorMessage }}
   </div>
 
-  <!-- RESTAURANTS -->
-  <div class="restaurants-scroll" *ngIf="!loading">
+  <!-- ================= RESTAURANTS ================= -->
+  <div class="restaurants-scroll"
+       *ngIf="!loading && filteredRestaurants && filteredRestaurants.length > 0">
 
-    <div *ngFor="let restaurant of filteredRestaurants"
+    <div *ngFor="let restaurant of filteredRestaurants; trackBy: trackByIndex"
          class="restaurant-card"
-         (click)="viewMenu(restaurant.id)">
+         (click)="restaurant?.id && viewMenu(restaurant.id)">
 
       <div class="card-image">
+        <!-- ✅ FIXED: Always shows an image (no ngIf) with fallback -->
         <img 
-          [src]="restaurant.imageUrl || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'"
+          class="restaurant-img"
+          [src]="restaurant.imageUrl ? ('http://localhost:8080/images/' + restaurant.imageUrl) : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80'"
+          alt="restaurant image"
+          loading="lazy"
+          onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80'"
         >
+
+        <div class="rating-badge">
+          ⭐ {{ restaurant.rating || '4.5' }}
+        </div>
+
       </div>
 
       <div class="card-content">
@@ -150,13 +209,7 @@
           <span class="address">
             📍 {{ restaurant.address || 'City Center' }}
           </span>
-
-          <span class="rating">
-            ⭐ {{ restaurant.rating || '4.5' }}
-          </span>
         </div>
-
-        
 
       </div>
 
@@ -164,32 +217,26 @@
 
   </div>
 
-  <!-- NO RESULTS -->
-  <div *ngIf="!loading && filteredRestaurants?.length === 0"
+  <!-- ================= NO RESULTS ================= -->
+  <div *ngIf="!loading && (!filteredRestaurants || filteredRestaurants.length === 0)"
        class="no-results">
     No restaurants found
   </div>
 
-  <!-- POPUP -->
-  <div class="cart-popup" *ngIf="showPopup">
-    Item added to cart
-  </div>
-
-  <!-- FLOATING CART -->
+  <!-- ================= CART ================= -->
   <div class="floating-cart" (click)="toggleCart()">
     🛒 {{ cart?.length || 0 }}
   </div>
 
-  <!-- CART PANEL -->
   <div class="cart-panel" *ngIf="showCart">
 
     <h3>Your Cart</h3>
 
-    <div *ngIf="!cart || cart.length === 0">
+    <div *ngIf="!cart?.length">
       Cart is empty
     </div>
 
-    <div *ngFor="let item of cart">
+    <div *ngFor="let item of cart; trackBy: trackByIndex">
       <p>{{ item.name }} x {{ item.qty }}</p>
       <span>₹{{ item.price * item.qty }}</span>
     </div>

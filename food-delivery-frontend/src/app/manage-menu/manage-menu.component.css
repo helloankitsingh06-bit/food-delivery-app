@@ -1,65 +1,358 @@
-body {
-  background: red;
-}
-.menu-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 20px;
+/* ===== PREMIUM BLACK + GOLD MANAGE MENU PAGE (FULL WORKING CSS) ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #050505 0%,
+    #0b0b0b 30%,
+    #111111 70%,
+    #080808 100%
+  );
+  padding: 40px;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
 }
 
-.menu-card {
-  background: #1e1e1e;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+/* ===== PAGE WRAPPER ===== */
+
+.page-wrapper {
+  max-width: 1400px;
+  margin: auto;
+}
+
+/* ===== HEADINGS ===== */
+
+h2 {
+  font-size: 34px;
+  font-weight: 800;
+  color: #ffd700;
+  margin-bottom: 30px;
+  letter-spacing: 0.5px;
+}
+
+h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 50px 0 25px;
+}
+
+/* ===== SUCCESS & ERROR MESSAGES ===== */
+
+.success-msg {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.error-msg {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* ===== FORM SECTION ===== */
+
+.menu-form {
+  background: linear-gradient(
+    145deg,
+    rgba(20, 20, 20, 0.95),
+    rgba(10, 10, 10, 0.95)
+  );
+  border: 1px solid rgba(255, 215, 0, 0.12);
+  border-radius: 24px;
+  padding: 35px;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 215, 0, 0.03);
+  margin-bottom: 40px;
+}
+
+/* ===== GRID ===== */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+/* ===== FORM GROUP ===== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+/* ===== LABELS ===== */
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #d9d9d9;
+  margin-bottom: 10px;
+}
+
+/* ===== INPUTS ===== */
+
+input,
+textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 215, 0, 0.10);
+  background: rgba(255, 255, 255, 0.04);
   color: white;
-  transition: transform 0.2s;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: rgba(255, 215, 0, 0.45);
+  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.05);
+}
+
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+/* ===== FILE INPUT ===== */
+
+input[type="file"] {
+  padding: 12px;
+  background: transparent;
+  border: 1px dashed rgba(255, 215, 0, 0.25);
+  cursor: pointer;
+}
+
+/* ===== SUBMIT BUTTON ===== */
+
+.submit-btn {
+  margin-top: 30px;
+  background: linear-gradient(
+    135deg,
+    #d4af37,
+    #ffd700
+  );
+  color: #111;
+  border: none;
+  padding: 15px 32px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.15);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(255, 215, 0, 0.22);
+}
+
+/* ===== MENU CONTAINER ===== */
+
+.menu-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 28px;
+}
+
+/* ===== MENU CARD ===== */
+
+.menu-card {
+  background: linear-gradient(
+    145deg,
+    rgba(20, 20, 20, 0.95),
+    rgba(10, 10, 10, 0.95)
+  );
+  border: 1px solid rgba(255, 215, 0, 0.12);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.4);
+  transition: all 0.35s ease;
 }
 
 .menu-card:hover {
-  transform: scale(1.03);
+  transform: translateY(-8px);
+  border-color: rgba(255, 215, 0, 0.30);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.6),
+    0 0 18px rgba(255, 215, 0, 0.08);
 }
+
+/* ===== FOOD IMAGE CONTAINER ===== */
+
+.food-image-container {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+}
+
+/* ===== IMAGE ===== */
 
 .food-img {
   width: 100%;
-  height: 150px;
+  height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
+.menu-card:hover .food-img {
+  transform: scale(1.05);
+}
+
+/* ===== NO IMAGE PLACEHOLDER ===== */
+
+.no-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  color: rgba(255, 215, 0, 0.3);
+}
+
+/* ===== CARD CONTENT ===== */
+
 .card-content {
-  padding: 15px;
+  padding: 22px;
+}
+
+.card-content h4 {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.card-content p {
+  font-size: 14px;
+  color: #bdbdbd;
+  line-height: 1.6;
+  margin-bottom: 10px;
 }
 
 .price {
-  font-weight: bold;
-  color: #ffcc00;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffd700 !important;
 }
 
 .qty {
   font-size: 13px;
-  color: #aaa;
+  color: #999 !important;
 }
+
+/* ===== ACTION BUTTONS ===== */
 
 .actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .actions button {
+  flex: 1;
   border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.3s ease;
 }
+
+/* ===== EDIT BUTTON ===== */
 
 .actions button:first-child {
-  background: #3498db;
-  color: white;
+  background: linear-gradient(
+    135deg,
+    #d4af37,
+    #ffd700
+  );
+  color: #111;
 }
 
+.actions button:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(255, 215, 0, 0.18);
+}
+
+/* ===== DELETE BUTTON ===== */
+
 .actions button:last-child {
-  background: #e74c3c;
+  background: rgba(255, 255, 255, 0.05);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.actions button:last-child:hover {
+  background: rgba(255, 77, 77, 0.12);
+  border-color: rgba(255, 77, 77, 0.25);
+  color: #ff6b6b;
+  transform: translateY(-2px);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+  :host {
+    padding: 20px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .food-image-container {
+    height: 180px;
+  }
+
+  .menu-form {
+    padding: 24px;
+  }
 }

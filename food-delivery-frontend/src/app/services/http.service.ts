@@ -66,12 +66,41 @@ export class HttpService {
 
   // ================= RESTAURANT =================
 
-  // ✅ THIS IS YOUR REQUIRED METHOD (already correct)
   addMenuItem(restaurantId: number, data: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/restaurant/menu?restaurantId=${restaurantId}`,
       data,
       { headers: this.getHeaders() }
+    );
+  }
+
+  // ✅ ADD MENU ITEM WITH IMAGE (FormData)
+  addMenuItemWithImage(restaurantId: number, formData: FormData): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    // Don't set Content-Type - let browser set it with boundary
+    
+    return this.http.post(
+      `${this.apiUrl}/restaurant/menu-with-image?restaurantId=${restaurantId}`,
+      formData,
+      { headers: headers }
+    );
+  }
+
+  // ✅ UPDATE MENU ITEM WITH IMAGE
+  updateMenuItemWithImage(id: number, formData: FormData): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    // Don't set Content-Type - let browser set it with boundary
+    
+    return this.http.put(
+      `${this.apiUrl}/restaurant/menu-with-image/${id}`,
+      formData,
+      { headers: headers }
     );
   }
 
@@ -91,6 +120,7 @@ export class HttpService {
 
   // ================= MENU =================
 
+  // ✅ GET MENU ITEMS BY RESTAURANT - Already exists and correct
   getMenuByRestaurant(restaurantId: number): Observable<any> {
     return this.http.get(
       `${this.apiUrl}/restaurant/menu?restaurantId=${restaurantId}`,
@@ -131,6 +161,66 @@ export class HttpService {
 
   getMyRestaurant(userId: number) {
     return this.http.get(`${this.apiUrl}/restaurant/my?userId=${userId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // ================= USER PROFILE =================
+  
+  // Update user profile with more fields
+  updateUser(userId: number, userData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${userId}`, userData, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // ================= RESTAURANT MANAGEMENT =================
+  
+  // CREATE RESTAURANT
+  createRestaurant(restaurantData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/restaurant/create`, restaurantData, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // GET RESTAURANTS BY OWNER EMAIL
+  getRestaurantsByOwner(email: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/restaurant/my-restaurants?email=${email}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // GET RESTAURANT BY OWNER EMAIL (SINGLE RESTAURANT) - FIXED ENDPOINT
+  getRestaurantByOwnerEmail(ownerEmail: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/restaurants/owner/email/${ownerEmail}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // GET RESTAURANT BY OWNER ID
+  getRestaurantByOwnerId(ownerId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/restaurants/owner/${ownerId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // UPDATE RESTAURANT
+  updateRestaurant(restaurantId: number, restaurantData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/restaurants/${restaurantId}`, restaurantData, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // DELETE RESTAURANT
+  deleteRestaurant(restaurantId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/restaurants/${restaurantId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // GET ALL RESTAURANTS (PUBLIC)
+  getAllRestaurantsList(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/restaurants`, {
       headers: this.getHeaders()
     });
   }

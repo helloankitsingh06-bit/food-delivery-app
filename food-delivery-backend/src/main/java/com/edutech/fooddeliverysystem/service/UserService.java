@@ -32,30 +32,8 @@ public class UserService {
         // ✅ Save user directly (NO new object creation)
         User savedUser = userRepository.save(user);
 
-        // ✅ CREATE RESTAURANT ONLY ONCE
-        if (savedUser.getRole() == User.Role.RESTAURANT) {
-
-            try {
-                Restaurant restaurant = new Restaurant();
-
-                String restaurantName = savedUser.getName();
-                if (restaurantName == null || restaurantName.trim().isEmpty()) {
-                    restaurantName = "My Restaurant";
-                }
-
-                restaurant.setName(restaurantName);
-                restaurant.setLocation("Default Location");
-
-                // 🔥 LINK OWNER
-                restaurant.setOwner(savedUser);
-
-                restaurantRepository.save(restaurant);
-
-            } catch (Exception e) {
-                System.out.println("❌ RESTAURANT CREATION FAILED");
-                e.printStackTrace();
-            }
-        }
+        // ✅ REMOVED AUTO-CREATION OF RESTAURANT
+        // Restaurant owners will create their restaurant manually through the frontend
 
         return savedUser;
     }
@@ -86,5 +64,11 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+
+    // ✅ NEW METHOD (STEP 3.2 FIX)
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

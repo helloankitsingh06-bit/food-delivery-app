@@ -142,20 +142,31 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.http.login(this.credentials).subscribe({
 
-      next: (res: any) => {
-
-        const token = res.token || res;
-
-        // 🔐 ALWAYS STORE IN LOCALSTORAGE
-        localStorage.setItem('token', token);
-
-        // 👤 STORE USER
-        if (res.user) {
-          localStorage.setItem('user_data', JSON.stringify(res.user));
+      next: (response: any) => {
+        console.log('Login response:', response); // DEBUG
+        
+        // ✅ FIX: Backend returns {user: {...}, token: '...'}
+        const user = response.user;  // Get the user object from response
+        const token = response.token;
+        
+        // Save token
+        if (token) {
+          localStorage.setItem('token', token);
         }
-
-        this.loading = false;
-
+        
+        // ✅ Save user data properly from response.user
+        const userData = {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          username: user.username
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        console.log('Saved user data:', localStorage.getItem('user')); // DEBUG
+        
         // 🎉 SHOW SUCCESS UI
         this.loginSuccess = true;
 
@@ -164,19 +175,35 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
         // 🚀 REDIRECT AFTER ANIMATION
         setTimeout(() => {
 
-          const role = res.user?.role;
-
-          if (role === 'CUSTOMER') {
+          // Redirect based on role
+          if (user.role === 'RESTAURANT') {
+            // Check if this restaurant already has a restaurant profile
+            this.http.getRestaurantsByOwner(user.email).subscribe({
+              next: (restaurants) => {
+                if (restaurants && restaurants.length > 0) {
+                  // Restaurant already exists → go to Orders page
+                  this.router.navigate(['/orders']);
+                } else {
+                  // No restaurant found → go to Create Restaurant page
+                  this.router.navigate(['/create-restaurant']);
+                }
+                this.loading = false;
+              },
+              error: () => {
+                // If error (no restaurant found), go to create page
+                this.router.navigate(['/create-restaurant']);
+                this.loading = false;
+              }
+            });
+          } else if (user.role === 'CUSTOMER') {
             this.router.navigate(['/restaurants']);
-          } 
-          else if (role === 'RESTAURANT') {
-            this.router.navigate(['/orders']); // 🔥 FIXED
-          } 
-          else if (role === 'DELIVERY') {
+            this.loading = false;
+          } else if (user.role === 'DELIVERY') {
             this.router.navigate(['/delivery']);
-          } 
-          else {
+            this.loading = false;
+          } else {
             this.router.navigate(['/restaurants']);
+            this.loading = false;
           }
 
         }, 1800);
@@ -184,8 +211,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       },
 
       error: (error: any) => {
-        console.error(error);
-        this.errorMessage = error.error?.message || 'Login failed';
+        console.error('Login error:', error);
+        this.errorMessage = 'Login failed. Please check your credentials.';
         this.loading = false;
       }
 

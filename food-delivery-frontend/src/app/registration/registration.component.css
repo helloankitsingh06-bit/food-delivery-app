@@ -17,7 +17,7 @@
   position: absolute;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(255,215,0,0.2), transparent);
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.2), transparent);
 }
 
 .register-container::before {
@@ -38,31 +38,24 @@
   padding: 30px;
   width: 350px;
   color: white;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.8s ease-in-out;
 }
 
 /* 🍽 Title */
-.app-title {
-  text-align: center;
-  font-size: 26px;
-  margin-bottom: 5px;
-}
-
-.app-title span {
-  color: gold;
-}
-
 .tagline {
   text-align: center;
   font-size: 12px;
   color: #aaa;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .register-heading {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #FFD700;
 }
 
 /* 🧾 Inputs */
@@ -72,30 +65,10 @@
   margin-bottom: 15px;
   border-radius: 8px;
   border: none;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   color: white;
-}
-
-/* 🔽 Dropdown Fix */
-select.form-control {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: rgba(255,255,255,0.08);
-  color: white;
-  cursor: pointer;
-}
-
-/* 🔽 Dropdown Options */
-select.form-control option {
-  background: #1a1a1a;  /* dark background */
-  color: white;         /* visible text */
-}
-
-/* Fix for some browsers */
-select.form-control:focus option:checked {
-  background: #FFD700;
-  color: black;
+  font-size: 14px;
+  transition: 0.3s;
 }
 
 .form-control::placeholder {
@@ -104,7 +77,27 @@ select.form-control:focus option:checked {
 
 .form-control:focus {
   outline: none;
-  box-shadow: 0 0 10px rgba(255,215,0,0.6);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+/* 🔽 Dropdown */
+select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+}
+
+select.form-control option {
+  background: #1a1a1a;
+  color: white;
+}
+
+select.form-control:focus option:checked {
+  background: #FFD700;
+  color: black;
 }
 
 /* 🟡 Button */
@@ -118,17 +111,18 @@ select.form-control:focus option:checked {
   font-weight: 600;
   cursor: pointer;
   transition: 0.3s;
+  font-size: 15px;
 }
 
 .btn-register:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255,215,0,0.7);
+  transform: scale(1.03);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
 }
 
 /* ➖ Divider */
 .divider {
   text-align: center;
-  margin: 15px 0;
+  margin: 18px 0;
   color: #aaa;
   position: relative;
 }
@@ -156,18 +150,39 @@ select.form-control:focus option:checked {
   text-align: center;
 }
 
+.login-link p {
+  margin-bottom: 5px;
+  color: #ccc;
+}
+
 .login-link a {
-  color: gold;
+  color: #FFD700;
   text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
 }
 
 /* ❌ Error */
 .alert-error {
   background: #2a0000;
   color: #ff4d4d;
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
   margin-bottom: 10px;
+  font-size: 13px;
+}
+
+/* ✅ Success */
+.alert-success {
+  background: #002a00;
+  color: #4dff88;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 13px;
 }
 
 /* 🎬 Animation */

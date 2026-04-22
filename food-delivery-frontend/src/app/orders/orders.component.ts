@@ -27,6 +27,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   userRole = '';
   userName = '';
+  userEmail = '';
+  restaurantName = '';
+  displayName = '';  // ✅ ADDED - This will show the correct name in header
   userAvatar = '';
 
   notificationCount = 0;
@@ -61,6 +64,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.loadDisplayName();  // ✅ ADDED - Load display name first
     this.initUser();
     this.loadMyRestaurant();
   }
@@ -68,6 +72,55 @@ export class OrdersComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // ✅ NEW METHOD - Load display name for header
+  loadDisplayName(): void {
+    const user = this.authService.getCurrentUser();
+    if (user && user.role === 'RESTAURANT') {
+      this.httpService.getRestaurantByOwnerId(user.id).subscribe({
+        next: (restaurant) => {
+          this.displayName = restaurant.name;
+        },
+        error: () => {
+          this.displayName = user.username || user.name;
+        }
+      });
+    } else if (user) {
+      this.displayName = user.name;
+    }
+  }
+
+  // ===== LOAD USER INFO =====
+  initUser(): void {
+    const user = this.authService.getCurrentUser();
+    this.userRole = this.authService.getUserRole();
+    
+    if (user) {
+      this.userRole = user.role;
+      this.userName = user.name || 'User';
+      this.userEmail = user.email;
+      this.userAvatar = user.avatar || '';
+      
+      // If user is restaurant owner, fetch their restaurant name
+      if (user.role === 'RESTAURANT' && user.email) {
+        this.httpService.getRestaurantByOwnerEmail(user.email).subscribe({
+          next: (restaurant) => {
+            if (restaurant && restaurant.name) {
+              this.restaurantName = restaurant.name;
+            } else {
+              this.restaurantName = user.name;
+            }
+          },
+          error: () => {
+            // No restaurant found yet, show user name
+            this.restaurantName = user.name;
+          }
+        });
+      } else {
+        this.restaurantName = user.name;
+      }
+    }
   }
 
   // ===== NAVIGATION =====
@@ -96,14 +149,6 @@ export class OrdersComponent implements OnInit, OnDestroy {
   logout() {
     localStorage.clear();
     this.router.navigate(['/login']);
-  }
-
-  // ===== USER =====
-  initUser(): void {
-    const user = this.authService.getUser();
-    this.userRole = this.authService.getUserRole();
-    this.userName = user?.name || 'User';
-    this.userAvatar = user?.avatar || '';
   }
 
   // ===== EDIT =====
@@ -248,7 +293,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   // ===== LOAD MY RESTAURANT =====
   loadMyRestaurant(): void {
-    const user = this.authService.getUser();
+    const user = this.authService.getCurrentUser();
 
     this.httpService.getMyRestaurant(user.id).subscribe({
       next: (res: any) => {

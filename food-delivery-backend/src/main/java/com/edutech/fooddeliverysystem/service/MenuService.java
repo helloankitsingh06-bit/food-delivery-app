@@ -1,6 +1,7 @@
 package com.edutech.fooddeliverysystem.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,15 +21,9 @@ public class MenuService {
     private RestaurantRepository restaurantRepository;
 
     public Menu addMenuItem(Long restaurantId, Menu menu) {
-
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-
         menu.setRestaurant(restaurant);
-
-        // auto set availability based on quantity
-        menu.setQuantity(menu.getQuantity());
-
         return menuRepository.save(menu);
     }
 
@@ -36,14 +31,16 @@ public class MenuService {
         return menuRepository.findByRestaurantId(restaurantId);
     }
     
-
     public void deleteMenuItem(Long id) {
         menuRepository.deleteById(id);
     }
-
+    
+    // ✅ ADD THIS METHOD
+    public Optional<Menu> getMenuItemById(Long id) {
+        return menuRepository.findById(id);
+    }
 
     public Menu updateMenuItem(Long id, Menu updatedMenu) {
-
         Menu menu = menuRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Menu not found"));
 
@@ -51,7 +48,11 @@ public class MenuService {
         menu.setPrice(updatedMenu.getPrice());
         menu.setDescription(updatedMenu.getDescription());
         menu.setQuantity(updatedMenu.getQuantity());
-        menu.setImageUrl(updatedMenu.getImageUrl());
+        
+        // Only update imageUrl if provided
+        if (updatedMenu.getImageUrl() != null) {
+            menu.setImageUrl(updatedMenu.getImageUrl());
+        }
 
         return menuRepository.save(menu);
     }

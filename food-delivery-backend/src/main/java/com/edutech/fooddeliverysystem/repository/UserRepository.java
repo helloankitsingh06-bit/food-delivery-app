@@ -1,12 +1,9 @@
 package com.edutech.fooddeliverysystem.repository;
 
+import com.edutech.fooddeliverysystem.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.edutech.fooddeliverysystem.entity.User;
-
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);  // ✅ MAKE SURE THIS EXISTS
 }

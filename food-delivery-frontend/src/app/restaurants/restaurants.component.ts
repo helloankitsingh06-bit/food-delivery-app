@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  HostListener,
-  AfterViewInit
-} from '@angular/core';
-
+import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpService } from '../services/http.service';
 import { AuthService } from '../services/auth.service';
@@ -15,9 +8,8 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './restaurants.component.html',
   styleUrls: ['./restaurants.component.css']
 })
-export class RestaurantsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class RestaurantsComponent implements OnInit, OnDestroy {
 
-  // ================= DATA =================
   restaurants: any[] = [];
   filteredRestaurants: any[] = [];
 
@@ -25,169 +17,150 @@ export class RestaurantsComponent implements OnInit, AfterViewInit, OnDestroy {
   errorMessage = '';
   searchTerm = '';
 
-  // ================= LOCATION =================
   showLocationDropdown = false;
-  locations: string[] = [];
+  locations: string[] = ['Delhi', 'Bangalore', 'Mumbai'];
   selectedLocation = '';
 
-  // ================= SLIDER =================
+  showFilter = false;
+
+  filters = {
+    highRating: false,
+    lowPrice: false
+  };
+
+  userRole: string = '';
+
+  // ================= SLIDER WITH ALL WORKING IMAGES =================
   slides = [
     {
-      type: 'image',
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80',
+      image: 'https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg?w=1200&q=80',
       title: 'Delicious Food',
       subtitle: 'Taste beyond imagination'
     },
     {
-      type: 'image',
-      image: 'https://images.unsplash.com/photo-1551218808-94e220e084d2',
-      title: 'Live Cooking',
-      subtitle: 'Watch chefs in action'
+      image: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?w=1200&q=80',
+      title: 'Gourmet',
+      subtitle: 'Fine dining at its best'
     },
     {
-      type: 'image',
-      image: 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1400&q=80',
-      title: 'Top Chefs',
-      subtitle: 'Curated by experts'
+      image: 'https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?w=1200&q=80',
+      title: 'Top Restaurants',
+      subtitle: 'Curated for you'
     }
   ];
 
   currentSlide = 0;
-  sliderInterval: any;
-  progressInterval: any;
-  progress = 0;
+  slideInterval: any;
 
-  loadedImages: boolean[] = [];
-
-  // ================= TOUCH (🔥 FIX ADDED) =================
-  private touchStartX = 0;
-  private touchEndX = 0;
+  // 🔥 AUTO REFRESH
+  refreshInterval: any;
 
   // ================= CART =================
   cart: any[] = [];
   showCart = false;
-  showPopup = false;
-  lastAddedItem: any = null;
 
   constructor(
     private httpService: HttpService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   // ================= INIT =================
   ngOnInit(): void {
-    this.loadLocations();
     this.loadSavedLocation();
     this.loadRestaurants();
-    this.preloadImages();
-  }
-
-  ngAfterViewInit(): void {
     this.startSlider();
+
+    // 🔥 REAL-TIME REFRESH
+    this.refreshInterval = setInterval(() => {
+      this.loadRestaurants(false);
+    }, 5000);
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.sliderInterval);
-    clearInterval(this.progressInterval);
-  }
+    this.stopSlider();
 
-  // ================= SLIDER =================
-  startSlider(): void {
-    this.startProgress();
-
-    this.sliderInterval = setInterval(() => {
-      this.nextSlide();
-    }, 4000);
-  }
-
-  nextSlide(): void {
-    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-    this.resetProgress();
-  }
-
-  prevSlide(): void {
-    this.currentSlide =
-      (this.currentSlide - 1 + this.slides.length) % this.slides.length;
-    this.resetProgress();
-  }
-
-  goToSlide(index: number): void {
-    this.currentSlide = index;
-    this.resetProgress();
-  }
-
-  pauseSlider(): void {
-    clearInterval(this.sliderInterval);
-    clearInterval(this.progressInterval);
-  }
-
-  resumeSlider(): void {
-    this.startSlider();
-  }
-
-  // ================= PROGRESS =================
-  startProgress(): void {
-    this.progress = 0;
-
-    this.progressInterval = setInterval(() => {
-      this.progress += 2.5;
-      if (this.progress >= 100) this.progress = 0;
-    }, 100);
-  }
-
-  resetProgress(): void {
-    clearInterval(this.progressInterval);
-    this.startProgress();
-  }
-
-  // ================= TOUCH FUNCTIONS (🔥 FIX) =================
-  onTouchStart(event: any): void {
-    this.touchStartX = event.changedTouches[0].screenX;
-  }
-
-  onTouchEnd(event: any): void {
-    this.touchEndX = event.changedTouches[0].screenX;
-
-    const diff = this.touchStartX - this.touchEndX;
-
-    if (diff > 50) {
-      this.nextSlide();
-    } else if (diff < -50) {
-      this.prevSlide();
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
     }
   }
 
-  // ================= IMAGE PRELOAD =================
-  preloadImages(): void {
-    this.slides.forEach((slide, i) => {
-      if (slide.type === 'image') {
-        const img = new Image();
-        img.src = slide.image;
-        img.onload = () => this.loadedImages[i] = true;
-      }
-    });
+  // ================= TRACKBY =================
+  trackByIndex(index: number): number {
+    return index;
   }
 
-  onImageLoad(index: number): void {
-    this.loadedImages[index] = true;
+  // ================= IMAGE =================
+  getImageUrl(r: any): string {
+    const path =
+      r?.imageUrl ||
+      r?.image ||
+      r?.img ||
+      r?.photo ||
+      r?.logo;
+
+    if (!path || typeof path !== 'string') {
+      return 'https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg?w=800&q=80';
+    }
+
+    const cleanPath = path.replace(/\\/g, '/');
+
+    if (cleanPath.startsWith('http')) {
+      return cleanPath;
+    }
+
+    const baseUrl = 'http://localhost:8080';
+    return `${baseUrl}/${cleanPath.replace(/^\/+/, '')}`;
   }
 
-  onImageError(event: any): void {
-    event.target.src =
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400';
-  }
-
-  // ================= RESTAURANTS =================
-  loadRestaurants(): void {
-    this.loading = true;
+  // ================= API =================
+  loadRestaurants(showLoader: boolean = true): void {
+    if (showLoader) this.loading = true;
 
     this.httpService.getAllRestaurants().subscribe({
-      next: (data: any) => {
-        this.restaurants = data || [];
-        this.filteredRestaurants = [...this.restaurants];
+      next: (data: any[]) => {
+
+        const updated = (data || []).map(r => {
+
+          // 🔥 FIX ADDRESS
+          let cleanAddress = 'City Center';
+
+          if (r.address && typeof r.address === 'string') {
+            const trimmed = r.address.trim();
+
+            if (
+              trimmed !== '' &&
+              trimmed.toLowerCase() !== 'null' &&
+              trimmed.toLowerCase() !== 'undefined'
+            ) {
+              cleanAddress = trimmed;
+            }
+          }
+
+          return {
+            id: r.id,
+            name: r.name || 'Restaurant',
+            cuisine: r.cuisine || 'Multi-Cuisine',
+            rating: Number(r.rating) || 4,
+            price: Number(r.price) || 300,
+            address: cleanAddress,
+            imageUrl: this.getImageUrl(r)
+          };
+        });
+
+        if (JSON.stringify(updated) !== JSON.stringify(this.restaurants)) {
+          this.restaurants = updated;
+
+          // 🔥 KEEP SEARCH + FILTERS AFTER REFRESH
+          this.applyLiveFilters();
+
+          this.cdr.detectChanges();
+        }
+
         this.loading = false;
       },
+
       error: (err) => {
         console.error(err);
         this.errorMessage = 'Failed to load restaurants';
@@ -202,105 +175,195 @@ export class RestaurantsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ================= SEARCH =================
   onSearch(): void {
-    const term = this.searchTerm.toLowerCase();
-
-    this.filteredRestaurants = this.restaurants.filter(r =>
-      r.name?.toLowerCase().includes(term) ||
-      r.cuisine?.toLowerCase().includes(term)
-    );
+    this.applyLiveFilters();
   }
 
-  // ================= NAVIGATION =================
-  viewMenu(id: number): void {
+  // ================= FILTER =================
+  toggleFilter() {
+    this.showFilter = !this.showFilter;
+  }
+
+  applyFilters() {
+    this.applyLiveFilters();
+    this.showFilter = false;
+  }
+
+  toggleQuickFilter(type: 'rating' | 'price') {
+    if (type === 'rating') {
+      this.filters.highRating = !this.filters.highRating;
+    } else {
+      this.filters.lowPrice = !this.filters.lowPrice;
+    }
+
+    this.applyLiveFilters();
+  }
+
+  // 🔥 CENTRAL FILTER LOGIC
+  applyLiveFilters() {
+    let data = [...this.restaurants];
+
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase().trim();
+      data = data.filter(r =>
+        r.name.toLowerCase().includes(term) ||
+        r.cuisine.toLowerCase().includes(term)
+      );
+    }
+
+    data = data.filter(r =>
+      (!this.filters.highRating || r.rating >= 4) &&
+      (!this.filters.lowPrice || r.price <= 300)
+    );
+
+    this.filteredRestaurants = data;
+  }
+
+  // ================= SORT =================
+  sortRestaurants(event: any) {
+    const value = event.target.value;
+    const sorted = [...this.filteredRestaurants];
+
+    if (value === 'low') {
+      sorted.sort((a, b) => a.price - b.price);
+    } else if (value === 'high') {
+      sorted.sort((a, b) => b.price - a.price);
+    } else if (value === 'rating') {
+      sorted.sort((a, b) => b.rating - a.rating);
+    }
+
+    this.filteredRestaurants = sorted;
+  }
+
+  // ================= NAV =================
+  viewMenu(id: number) {
     this.router.navigate(['/menu', id]);
   }
 
-  goToProfile(): void {
+  goToProfile() {
     this.router.navigate(['/profile']);
   }
 
+  // Check if logged-in user is RESTAURANT
+  isRestaurantOwner(): boolean {
+    const user = this.authService.getCurrentUser();
+    if (user && user.role) {
+      this.userRole = user.role;
+      return user.role === 'RESTAURANT';
+    }
+    return false;
+  }
+
+  goToCreateRestaurant() {
+    if (this.isRestaurantOwner()) {
+      this.router.navigate(['/create-restaurant']);
+    } else {
+      this.errorMessage = 'Only restaurant owners can add restaurants';
+    }
+  }
+
   // ================= LOCATION =================
-  toggleLocationDropdown(event: Event): void {
+  toggleLocationDropdown(event: Event) {
     event.stopPropagation();
     this.showLocationDropdown = !this.showLocationDropdown;
   }
 
-  selectLocation(loc: string, event: Event): void {
-  event.stopPropagation();
-  this.selectedLocation = loc;
-  localStorage.setItem('user_location', loc);
-  this.showLocationDropdown = false;
+  selectLocation(location: string, event: Event) {
+    event.stopPropagation();
+    this.selectedLocation = location;
+    localStorage.setItem('user_location', location);
+    this.showLocationDropdown = false;
   }
 
-  addLocation(): void {
-    const loc = prompt('Enter address');
-    if (loc && loc.trim()) {
-      this.locations.unshift(loc.trim());
-      this.saveLocations();
+  addLocation() {
+    const loc = prompt('Enter new address');
+    if (loc) {
+      this.locations.unshift(loc);
+      this.selectedLocation = loc;
+      localStorage.setItem('user_location', loc);
     }
   }
 
-  editLocation(index: number, event: Event): void {
+  editLocation(index: number, event: Event) {
     event.stopPropagation();
+
     const updated = prompt('Edit address', this.locations[index]);
-    if (updated && updated.trim()) {
-      this.locations[index] = updated.trim();
-      this.saveLocations();
+
+    if (updated) {
+      const old = this.locations[index];
+      this.locations[index] = updated;
+
+      if (this.selectedLocation === old) {
+        this.selectedLocation = updated;
+      }
+
+      localStorage.setItem('user_location', updated);
     }
   }
 
-  deleteLocation(index: number, event: Event): void {
+  deleteLocation(index: number, event: Event) {
     event.stopPropagation();
+
+    const removed = this.locations[index];
     this.locations.splice(index, 1);
-    this.saveLocations();
+
+    if (this.selectedLocation === removed) {
+      this.selectedLocation = this.locations[0] || 'Select Location';
+    }
   }
 
-  saveLocations(): void {
-    localStorage.setItem('user_locations', JSON.stringify(this.locations));
-  }
-
-  loadLocations(): void {
-    const saved = localStorage.getItem('user_locations');
-    this.locations = saved ? JSON.parse(saved) : ['Select Location'];
-  }
-
-  loadSavedLocation(): void {
+  loadSavedLocation() {
     const saved = localStorage.getItem('user_location');
-    this.selectedLocation = saved || this.locations[0];
+    this.selectedLocation = saved || 'Select Location';
+  }
+
+  // ================= SLIDER =================
+  startSlider() {
+    this.stopSlider();
+
+    this.slideInterval = setInterval(() => {
+      this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+      this.cdr.detectChanges();
+    }, 4000);
+  }
+
+  stopSlider() {
+    if (this.slideInterval) {
+      clearInterval(this.slideInterval);
+    }
+  }
+
+  pauseSlider() {
+    this.stopSlider();
+  }
+
+  resumeSlider() {
+    this.startSlider();
+  }
+
+  nextSlide() {
+    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+  }
+
+  prevSlide() {
+    this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+  }
+
+  goToSlide(index: number) {
+    this.currentSlide = index;
   }
 
   // ================= CART =================
-  addToCart(item: any): void {
-    const existing = this.cart.find(i => i.name === item.name);
-
-    if (existing) {
-      existing.qty++;
-    } else {
-      this.cart.push({
-        name: item.name,
-        price: item.price || 200,
-        qty: 1
-      });
-    }
-
-    this.lastAddedItem = item;
-    this.showPopup = true;
-
-    setTimeout(() => this.showPopup = false, 2000);
-  }
-
-  toggleCart(): void {
+  toggleCart() {
     this.showCart = !this.showCart;
   }
 
-  getTotal(): number {
-    return this.cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  getTotal() {
+    return this.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   }
 
   // ================= CLICK OUTSIDE =================
   @HostListener('document:click')
-  closeDropdown(): void {
+  closeDropdown() {
     this.showLocationDropdown = false;
   }
-
 }

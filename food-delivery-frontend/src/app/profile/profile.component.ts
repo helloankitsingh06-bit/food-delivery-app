@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
-
-// 🔥 REQUIRED IMPORTS FOR STANDALONE
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, NavigationEnd } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { HttpService } from '../services/http.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -16,137 +16,205 @@ import { FormsModule } from '@angular/forms';
 export class ProfileComponent implements OnInit {
 
   user: any = {};
+  restaurant: any = null;
+  isLoading = true;
+  isEditing = false;
+  errorMessage = '';
+  successMessage = '';
 
-  activeTab: string = 'profile';
+  displayName: string = '';
+  displayRole: string = '';
 
-  orders: any[] = [];
+  userForm = {
+    name: '',
+    email: '',
+    phone: '',
+    address: ''
+  };
 
-  darkMode: boolean = false;
-  notifications: boolean = true;
-
-  // 🔥 EDIT PROFILE
-  editMode: boolean = false;
-  backupUser: any = {};
+  restaurantForm = {
+    id: null as number | null,
+    name: '',
+    location: '',
+    address: '',
+    cuisine: '',
+    imageUrl: '',
+    rating: 0
+  };
 
   constructor(
-    private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private httpService: HttpService,
+    private router: Router
   ) {}
 
-  // =========================
-  // 🚀 INIT
-  // =========================
-  ngOnInit(): void {
+  ngOnInit() {
+    this.loadData();
 
-    const storedUser = localStorage.getItem('user_data');
+    // 🔥 IMPORTANT: reload data whenever user comes back to profile
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        if (this.router.url === '/profile') {
+          this.loadData();
+        }
+      });
+  }
 
-    if (storedUser) {
-      this.user = JSON.parse(storedUser);
-    } else {
+  loadData() {
+    this.isLoading = true;
+    this.user = this.authService.getCurrentUser();
+
+    console.log('User:', this.user);
+
+    if (!this.user) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.loadOrders();
-    this.applySettings();
-  }
+    this.displayRole = this.user.role;
 
-  // =========================
-  // 🔄 TAB SWITCH
-  // =========================
-  setTab(tab: string): void {
-    this.activeTab = tab;
-  }
+    // ✅ RESTAURANT USER
+    if (this.user.role === 'RESTAURANT') {
+      this.httpService.getRestaurantByOwnerId(this.user.id).subscribe({
+        next: (restaurant) => {
+          console.log('Restaurant API response:', restaurant);
 
-  // =========================
-  // 📦 LOAD ORDERS
-  // =========================
-  loadOrders(): void {
-    this.orders = [
-      { id: 101, total: 250, status: 'Delivered' },
-      { id: 102, total: 180, status: 'On the way' }
-    ];
-  }
+          this.restaurant = restaurant;
 
-  // =========================
-  // ⚙️ SETTINGS
-  // =========================
-  applySettings(): void {
-    const savedDark = localStorage.getItem('darkMode');
-    const savedNotif = localStorage.getItem('notifications');
+          if (restaurant) {
+            this.restaurantForm = {
+              id: restaurant.id,
+              name: restaurant.name || '',
+              location: restaurant.location || '',
+              address: restaurant.address || '',
+              cuisine: restaurant.cuisine || '',
+              imageUrl: restaurant.imageUrl || '',
+              rating: restaurant.rating || 0
+            };
 
-    if (savedDark !== null) {
-      this.darkMode = JSON.parse(savedDark);
-    }
+            this.displayName = restaurant.name || 'Restaurant';
+          } else {
+            this.displayName = this.user.username || this.user.name;
+          }
 
-    if (savedNotif !== null) {
-      this.notifications = JSON.parse(savedNotif);
-    }
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error fetching restaurant:', err);
+          this.displayName = this.user.username || this.user.name;
+          this.isLoading = false;
+        }
+      });
 
-    this.updateDarkMode();
-  }
-
-  toggleDarkMode(): void {
-    this.darkMode = !this.darkMode;
-    localStorage.setItem('darkMode', JSON.stringify(this.darkMode));
-    this.updateDarkMode();
-  }
-
-  toggleNotifications(): void {
-    this.notifications = !this.notifications;
-    localStorage.setItem('notifications', JSON.stringify(this.notifications));
-  }
-
-  updateDarkMode(): void {
-    if (this.darkMode) {
-      document.body.classList.add('dark-mode');
     } else {
-      document.body.classList.remove('dark-mode');
+      // ✅ CUSTOMER / DELIVERY
+      this.userForm = {
+        name: this.user.name || '',
+        email: this.user.email || '',
+        phone: this.user.phone || '',
+        address: this.user.address || ''
+      };
+
+      this.displayName = this.user.name || 'User';
+      this.isLoading = false;
     }
   }
 
-  // =========================
-  // ✏️ EDIT PROFILE
-  // =========================
-  enableEdit(): void {
-    this.editMode = true;
-    this.backupUser = { ...this.user };
+  toggleEdit() {
+    this.isEditing = !this.isEditing;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
-  cancelEdit(): void {
-    this.user = { ...this.backupUser };
-    this.editMode = false;
+  // ✅ UPDATE CUSTOMER
+  updateCustomerProfile() {
+    this.httpService.updateUser(this.user.id, this.userForm).subscribe({
+      next: () => {
+        const updatedUser = { ...this.user, ...this.userForm };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+
+        this.user = updatedUser;
+        this.displayName = updatedUser.name;
+
+        this.showSuccess('Profile updated successfully!');
+        this.isEditing = false;
+      },
+      error: (error) => {
+        this.showError(error.error?.message || 'Failed to update profile');
+      }
+    });
   }
 
-  saveProfile(): void {
-    localStorage.setItem('user_data', JSON.stringify(this.user));
-    this.editMode = false;
+  // ✅ UPDATE RESTAURANT
+  updateRestaurantProfile() {
+    if (!this.restaurantForm.id) {
+      this.showError('No restaurant found to update');
+      return;
+    }
 
-    alert('Profile updated successfully ✅');
+    this.httpService.updateRestaurant(this.restaurantForm.id, this.restaurantForm).subscribe({
+      next: (response) => {
+        this.restaurant = response;
+        this.displayName = response.name;
+
+        this.showSuccess('Restaurant updated successfully!');
+        this.isEditing = false;
+
+        // 🔥 reload fresh data
+        this.loadData();
+      },
+      error: (error) => {
+        this.showError(error.error?.message || 'Failed to update restaurant');
+      }
+    });
   }
 
-  // =========================
-  // 🆘 HELP BUTTON
-  // =========================
-  openHelp(): void {
-    alert('📞 Support: +91 9876543210\n📧 Email: support@foodroyal.com');
+  // ✅ DELETE RESTAURANT
+  deleteRestaurant() {
+    if (!this.restaurantForm.id) return;
+
+    if (confirm('⚠️ Are you sure you want to delete your restaurant?')) {
+      this.httpService.deleteRestaurant(this.restaurantForm.id).subscribe({
+        next: () => {
+          this.showSuccess('Restaurant deleted successfully!');
+          
+          this.restaurant = null; // 🔥 clear UI instantly
+
+          setTimeout(() => {
+            this.router.navigate(['/create-restaurant']);
+          }, 1500);
+        },
+        error: (error) => {
+          this.showError(error.error?.message || 'Failed to delete restaurant');
+        }
+      });
+    }
   }
 
-  // =========================
-  // 🔙 BACK
-  // =========================
-  goBack(): void {
-    window.history.back();
+  goBack() {
+    if (this.user.role === 'RESTAURANT') {
+      this.router.navigate(['/orders']);
+    } else {
+      this.router.navigate(['/restaurants']);
+    }
   }
 
-  // =========================
-  // 🚪 LOGOUT
-  // =========================
-  logout(): void {
-    localStorage.clear();
-    sessionStorage.clear();
+  logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
+  // ✅ MESSAGE HANDLING
+  private showSuccess(message: string) {
+    this.successMessage = message;
+    this.errorMessage = '';
+    setTimeout(() => this.successMessage = '', 3000);
+  }
+
+  private showError(message: string) {
+    this.errorMessage = message;
+    this.successMessage = '';
+    setTimeout(() => this.errorMessage = '', 3000);
+  }
 }

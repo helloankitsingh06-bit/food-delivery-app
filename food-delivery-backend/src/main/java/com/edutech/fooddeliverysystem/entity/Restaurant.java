@@ -1,15 +1,10 @@
 package com.edutech.fooddeliverysystem.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Restaurant {
 
     @Id
@@ -18,21 +13,47 @@ public class Restaurant {
 
     private String name;
     private String location;
-
-    // 🔥 EXTRA FIELDS
     private String cuisine;
     private String address;
     private Double rating;
     private String imageUrl;
 
-    // 🔗 OWNER LINK (VERY IMPORTANT)
+    // 🔗 OWNER LINK
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    @JsonIgnore   // ✅ ADD THIS
+    @JsonIgnore
     private User owner;
+
+    // 🔥 NEW - Just for receiving data from frontend (won't save to DB)
+    @Transient
+    private String ownerEmail;
 
     // 🔗 MENU RELATION
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Menu> menus;
+
+    // ========== GETTERS ==========
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getLocation() { return location; }
+    public String getCuisine() { return cuisine; }
+    public String getAddress() { return address; }
+    public Double getRating() { return rating; }
+    public String getImageUrl() { return imageUrl; }
+    public User getOwner() { return owner; }
+    public String getOwnerEmail() { return ownerEmail; }
+    public List<Menu> getMenus() { return menus; }
+
+    // ========== SETTERS ==========
+    public void setId(Long id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setLocation(String location) { this.location = location; }
+    public void setCuisine(String cuisine) { this.cuisine = cuisine; }
+    public void setAddress(String address) { this.address = address; }
+    public void setRating(Double rating) { this.rating = rating; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setOwner(User owner) { this.owner = owner; }
+    public void setOwnerEmail(String ownerEmail) { this.ownerEmail = ownerEmail; }
+    public void setMenus(List<Menu> menus) { this.menus = menus; }
 }
