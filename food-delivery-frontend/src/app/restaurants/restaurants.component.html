@@ -1,42 +1,48 @@
-<div class="restaurants-container">
-
+<div class="restaurants-container" (click)="closeDropdown()">
   <!-- ================= NAVBAR ================= -->
   <div class="glass-navbar">
-
     <div class="nav-left">
       <div class="logo-group">
         <span class="logo-text">FORKIT</span>
 
-        <div class="location-display" (click)="toggleLocationDropdown($event)">
-          📍 {{ selectedLocation || 'Select Location' }}
-          <span class="dropdown-arrow">▼</span>
-        </div>
-      </div>
-
-      <!-- DROPDOWN -->
-      <div class="location-dropdown"
-           *ngIf="showLocationDropdown"
-           (click)="$event.stopPropagation()">
-
-        <div class="location-item"
-             *ngFor="let loc of locations; let i = index"
-             [class.active]="loc === selectedLocation">
-
-          <span (click)="selectLocation(loc, $event)">
-            {{ loc }}
-          </span>
-
-          <div class="loc-actions">
-            <button class="icon-btn edit" (click)="editLocation(i, $event)">✎</button>
-            <button class="icon-btn delete" (click)="deleteLocation(i, $event)">🗑</button>
+        <!-- PREMIUM LOCATION SELECTOR -->
+        <div class="premium-location">
+          <div class="location-trigger" (click)="toggleLocationDropdown($event)">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{ selectedLocation || 'Select Location' }}</span>
+            <i class="fas fa-chevron-down" [class.rotated]="showLocationDropdown"></i>
           </div>
 
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="add-location" (click)="addLocation()">
-          ➕ Add Address
+          <div class="location-dropdown-premium" *ngIf="showLocationDropdown" (click)="$event.stopPropagation()">
+            <div class="dropdown-header">
+              <span>📍 Delivery Address</span>
+              <i class="fas fa-truck-fast"></i>
+            </div>
+            <div class="dropdown-list">
+              <div *ngFor="let loc of locations; let i = index" 
+                   class="dropdown-item" 
+                   [class.active]="loc.name === selectedLocation"
+                   (click)="selectLocation(loc.name, $event)">
+                <i class="fas" [class.fa-dot-circle]="loc.name === selectedLocation" [class.fa-circle]="loc.name !== selectedLocation"></i>
+                <span class="address-name">{{ loc.name }}</span>
+                <span class="address-tag">
+                  <i *ngIf="loc.type === 'home'" class="fas fa-home"></i>
+                  <i *ngIf="loc.type === 'work'" class="fas fa-briefcase"></i>
+                  <i *ngIf="loc.type === 'other'" class="fas fa-map-marker-alt"></i>
+                  {{ loc.type === 'home' ? 'Home' : loc.type === 'work' ? 'Work' : 'Other' }}
+                </span>
+                <div class="item-actions">
+                  <button class="action-edit" (click)="editLocation(i, $event)"><i class="fas fa-pen"></i></button>
+                  <button class="action-delete" (click)="deleteLocation(i, $event)"><i class="fas fa-trash-alt"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown-footer">
+              <button class="add-address-btn" (click)="addLocation()">
+                <i class="fas fa-plus-circle"></i> Add new address
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -47,11 +53,9 @@
         🍽️ Add Restaurant
       </button>
       <button class="profile-btn" (click)="goToProfile()">
-        <i class="fa-solid fa-user"></i>
-        Profile
+        <i class="fa-solid fa-user"></i> Profile
       </button>
     </div>
-
   </div>
 
   <!-- ================= HERO SLIDER ================= -->
@@ -59,108 +63,74 @@
        *ngIf="slides?.length"
        (mouseenter)="pauseSlider()"
        (mouseleave)="resumeSlider()">
-
-    <div class="slide"
-         *ngFor="let slide of slides; let i = index; trackBy: trackByIndex"
-         [class.active]="i === currentSlide">
-
-      <img
-        class="slide-img"
-        [src]="slide.image"
-        alt="slider image"
-        loading="eager"
-        (error)="slide.image='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80'"
-      />
-
-      <div class="slide-overlay">
-        <h2>{{ slide.title }}</h2>
-        <p>{{ slide.subtitle }}</p>
+    <div class="slides-wrapper">
+      <div class="slide"
+           *ngFor="let slide of slides; let i = index; trackBy: trackByIndex"
+           [class.active]="i === currentSlide">
+        <img class="slide-img" [src]="slide.image" alt="slider image" loading="eager"
+             (error)="slide.image='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80'">
+        <div class="slide-overlay">
+          <h2>{{ slide.title }}</h2>
+          <p>{{ slide.subtitle }}</p>
+        </div>
       </div>
-
     </div>
-
     <button class="nav prev" (click)="prevSlide()">‹</button>
     <button class="nav next" (click)="nextSlide()">›</button>
-
     <div class="slider-dots">
       <span *ngFor="let s of slides; let i = index; trackBy: trackByIndex"
-            (click)="goToSlide(i)"
-            [class.active]="i === currentSlide">
-      </span>
+            (click)="goToSlide(i)" [class.active]="i === currentSlide"></span>
     </div>
-
   </div>
 
   <!-- ================= HERO ================= -->
   <div class="hero-section">
-
     <h1 class="hero-title">
       <span class="gold-text">PREMIUM</span> DELIVERY
       <span class="gold-text">EXPERIENCE</span>
     </h1>
-
-    <p class="hero-subtitle">
-      Discover the finest restaurants curated just for you
-    </p>
-
+    <p class="hero-subtitle">Discover the finest restaurants curated just for you</p>
     <div class="search-container">
-      <input type="text"
-             [(ngModel)]="searchTerm"
-             (input)="onSearch()"
-             placeholder="Search restaurants..."
-             class="search-input">
+      <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()"
+             placeholder="Search restaurants..." class="search-input">
     </div>
-
   </div>
 
-  <!-- ================= FILTER ================= -->
+  <!-- ================= PREMIUM FILTERS BAR (Sort dropdown removed) ================= -->
   <div class="filters-bar">
-
-    <div class="filters-left">
-
-      <button class="chip" (click)="toggleFilter()">
-        ⚙ Filters
+    <div class="filter-premium-wrapper">
+      <button class="filter-premium-trigger" (click)="toggleFilter($event)">
+        <i class="fas fa-sliders-h"></i> Filters
+        <i class="fas fa-chevron-down" [class.rotated]="showFilter"></i>
       </button>
 
-      <!-- 🔥 FIX: apply filter instantly -->
-      <button class="chip"
-              [class.active]="filters.highRating"
-              (click)="toggleQuickFilter('rating')">
-        ⭐ 4+
-      </button>
-
-      <button class="chip"
-              [class.active]="filters.lowPrice"
-              (click)="toggleQuickFilter('price')">
-        💰 Budget
-      </button>
-
+      <div class="filter-premium-dropdown" *ngIf="showFilter" (click)="$event.stopPropagation()">
+        <div class="filter-dropdown-header">
+          <span>✨ Refine your search</span>
+          <button class="close-filter" (click)="showFilter = false"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="filter-dropdown-body">
+          <div class="filter-section">
+            <div class="filter-title">⭐ Rating</div>
+            <label class="filter-option">
+              <input type="checkbox" [(ngModel)]="filters.highRating"> 4 stars & above
+            </label>
+          </div>
+          <div class="filter-section">
+            <div class="filter-title">💰 Budget</div>
+            <label class="filter-option">
+              <input type="checkbox" [(ngModel)]="filters.lowPrice"> Under ₹300
+            </label>
+          </div>
+        </div>
+        <div class="filter-dropdown-footer">
+          <button class="apply-filters-btn" (click)="applyFilters()">Apply filters</button>
+          <button class="reset-filters-btn" (click)="resetFilters()">Reset</button>
+        </div>
+      </div>
     </div>
 
-    <div class="filters-right">
-      <select class="sort-dropdown" (change)="sortRestaurants($event)">
-        <option value="">Sort</option>
-        <option value="low">₹ Low → High</option>
-        <option value="high">₹ High → Low</option>
-        <option value="rating">⭐ Rating</option>
-      </select>
-    </div>
-
-  </div>
-
-  <!-- FILTER PANEL -->
-  <div class="filter-panel" *ngIf="showFilter">
-    <label>
-      <input type="checkbox" [(ngModel)]="filters.highRating">
-      Rating 4+
-    </label>
-
-    <label>
-      <input type="checkbox" [(ngModel)]="filters.lowPrice">
-      Budget Friendly
-    </label>
-
-    <button (click)="applyFilters()">Apply</button>
+    <!-- ❌ SORT DROPDOWN REMOVED (will be added inside menu page later) -->
   </div>
 
   <!-- ================= LOADING ================= -->
@@ -169,57 +139,30 @@
   </div>
 
   <!-- ================= ERROR ================= -->
-  <div *ngIf="errorMessage" class="alert-error">
-    {{ errorMessage }}
-  </div>
+  <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
 
   <!-- ================= RESTAURANTS ================= -->
-  <div class="restaurants-scroll"
-       *ngIf="!loading && filteredRestaurants && filteredRestaurants.length > 0">
-
+  <div class="restaurants-scroll" *ngIf="!loading && filteredRestaurants?.length">
     <div *ngFor="let restaurant of filteredRestaurants; trackBy: trackByIndex"
-         class="restaurant-card"
-         (click)="restaurant?.id && viewMenu(restaurant.id)">
-
+         class="restaurant-card" (click)="restaurant?.id && viewMenu(restaurant.id)">
       <div class="card-image">
-        <!-- ✅ FIXED: Always shows an image (no ngIf) with fallback -->
-        <img 
-          class="restaurant-img"
-          [src]="restaurant.imageUrl ? ('http://localhost:8080/images/' + restaurant.imageUrl) : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80'"
-          alt="restaurant image"
-          loading="lazy"
-          onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80'"
-        >
-
-        <div class="rating-badge">
-          ⭐ {{ restaurant.rating || '4.5' }}
-        </div>
-
+        <img class="restaurant-img"
+             [src]="restaurant.rawImageUrl ? ('http://localhost:8080/images/' + restaurant.rawImageUrl) : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80'"
+             onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80'">
+        <div class="rating-badge">⭐ {{ restaurant.rating || '4.5' }}</div>
       </div>
-
       <div class="card-content">
-
         <h3>{{ restaurant.name || 'Restaurant' }}</h3>
-
-        <div class="cuisine-tag">
-          {{ restaurant.cuisine || 'Multi-Cuisine' }}
-        </div>
-
+        <div class="cuisine-tag">{{ restaurant.cuisine || 'Multi-Cuisine' }}</div>
         <div class="card-footer">
-          <span class="address">
-            📍 {{ restaurant.address || 'City Center' }}
-          </span>
+          <span class="address">📍 {{ restaurant.address || 'City Center' }}</span>
         </div>
-
       </div>
-
     </div>
-
   </div>
 
   <!-- ================= NO RESULTS ================= -->
-  <div *ngIf="!loading && (!filteredRestaurants || filteredRestaurants.length === 0)"
-       class="no-results">
+  <div *ngIf="!loading && !filteredRestaurants?.length" class="no-results">
     No restaurants found
   </div>
 
@@ -227,24 +170,15 @@
   <div class="floating-cart" (click)="toggleCart()">
     🛒 {{ cart?.length || 0 }}
   </div>
-
   <div class="cart-panel" *ngIf="showCart">
-
     <h3>Your Cart</h3>
-
-    <div *ngIf="!cart?.length">
-      Cart is empty
-    </div>
-
+    <div *ngIf="!cart?.length">Cart is empty</div>
     <div *ngFor="let item of cart; trackBy: trackByIndex">
       <p>{{ item.name }} x {{ item.qty }}</p>
       <span>₹{{ item.price * item.qty }}</span>
     </div>
-
     <h4>Total: ₹{{ getTotal() }}</h4>
-
     <button class="checkout-btn">Checkout</button>
-
   </div>
 
 </div>

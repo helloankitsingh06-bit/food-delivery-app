@@ -49,7 +49,9 @@ export class HttpService {
       headers: this.getHeaders()
     });
   }
-
+  getUserProfile(userId: number) {
+    return this.http.get<any>(`http://localhost:8080/api/users/${userId}`);
+  }
   placeOrder(restaurantId: number, data: any): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/customer/order?restaurantId=${restaurantId}`,
@@ -174,6 +176,13 @@ export class HttpService {
     });
   }
 
+  // ✅ CHANGE PASSWORD
+  changePassword(userId: number, passwords: { currentPassword: string; newPassword: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/change-password/${userId}`, passwords, {
+      headers: this.getHeaders()
+    });
+  }
+
   // ================= RESTAURANT MANAGEMENT =================
   
   // CREATE RESTAURANT
@@ -223,5 +232,34 @@ export class HttpService {
     return this.http.get(`${this.apiUrl}/restaurants`, {
       headers: this.getHeaders()
     });
+  }
+  // ================= PROFILE STATS =================
+
+// CUSTOMER STATS
+  getCustomerStats() {
+    return this.http.get(`/api/orders/customer/stats`);
+  }
+
+// RESTAURANT STATS
+  getRestaurantStats(ownerId: number) {
+    return this.http.get(`/api/restaurants/${ownerId}/stats`);
+  }
+
+// DELIVERY STATS
+  getDeliveryStats() {
+    return this.http.get(`/api/delivery/stats`);
+  }
+
+
+// ================= IMAGE UPLOAD =================
+  uploadImage(formData: FormData) {
+    return this.http.post(`/api/upload`, formData);
+  }
+
+
+// ================= OLD PASSWORD ENDPOINT (keep for compatibility) =================
+  // Legacy changePassword method (POST /api/auth/change-password)
+  changePasswordLegacy(data: any) {
+    return this.http.post(`/api/auth/change-password`, data);
   }
 }

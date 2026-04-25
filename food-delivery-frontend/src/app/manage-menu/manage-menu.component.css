@@ -1,5 +1,3 @@
-/* ===== PREMIUM BLACK + GOLD MANAGE MENU PAGE (FULL WORKING CSS) ===== */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :host {
@@ -355,4 +353,69 @@ input[type="file"] {
   .menu-form {
     padding: 24px;
   }
+}
+
+/* ===== OUT OF STOCK IMAGE BLUR ===== */
+
+.out-of-stock-image {
+  filter: blur(3px) grayscale(70%);
+  opacity: 0.6;
+}
+
+/* ===== OUT OF STOCK TEXT ===== */
+
+.stock-status {
+  margin-top: 10px;
+  color: #ff6b6b;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ===== OUT OF STOCK BUTTON ===== */
+
+.stock-btn {
+  background: rgba(255, 140, 0, 0.12);
+  color: #ffb347;
+  border: 1px solid rgba(255, 165, 0, 0.25);
+}
+
+.stock-btn:hover {
+  background: rgba(255, 165, 0, 0.18);
+  transform: translateY(-2px);
+}
+
+/* ===== TOP BUTTONS ALIGNMENT ===== */
+
+/* ===== PREMIUM OUT OF STOCK BUTTON ===== */
+
+.top-buttons {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.stock-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 80, 80, 0.15),
+    rgba(255, 50, 50, 0.08)
+  );
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.18);
+  padding: 15px 30px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.stock-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 215, 0, 0.35);
+  box-shadow:
+    0 12px 28px rgba(255, 215, 0, 0.08);
 }

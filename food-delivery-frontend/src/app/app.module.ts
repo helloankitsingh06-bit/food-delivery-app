@@ -16,6 +16,8 @@ import { MenuComponent } from './menu/menu.component';
 import { OrdersComponent } from './orders/orders.component';
 import { DeliveryComponent } from './delivery/delivery.component';
 import { CreateRestaurantComponent } from './create-restaurant/create-restaurant.component';
+import { PaymentComponent } from './payment/payment.component';
+
 
 // ✅ ROUTES (OPTIMIZED)
 const routes: Routes = [
@@ -44,23 +46,16 @@ const routes: Routes = [
   { path: 'dashboard', component: OrdersComponent, canActivate: [AuthGuard] },
 
   { path: 'delivery', component: DeliveryComponent, canActivate: [AuthGuard] },
+  
+  { path: 'payment', component: PaymentComponent, canActivate: [AuthGuard] },
+
 
   // Profile (standalone)
-  {
-    path: 'profile',
-    loadComponent: () =>
-      import('./profile/profile.component').then(m => m.ProfileComponent),
-    canActivate: [AuthGuard]
-  },
+  { path: 'profile', loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent), canActivate: [AuthGuard] },
+
 
   // ✅ BEST PRACTICE: Manage Menu with Restaurant ID (standalone lazy load)
-  {
-    path: 'manage-menu/:restaurantId',
-    loadComponent: () =>
-      import('./manage-menu/manage-menu.component').then(m => m.ManageMenuComponent),
-    canActivate: [AuthGuard]
-  }
-
+  { path: 'manage-menu/:restaurantId', loadComponent: () => import('./manage-menu/manage-menu.component').then(m => m.ManageMenuComponent), canActivate: [AuthGuard] }
 ];
 
 @NgModule({
@@ -73,6 +68,7 @@ const routes: Routes = [
     MenuComponent,
     OrdersComponent,
     DeliveryComponent,
+    PaymentComponent,
     CreateRestaurantComponent
     // ❌ DO NOT ADD standalone components here
   ],

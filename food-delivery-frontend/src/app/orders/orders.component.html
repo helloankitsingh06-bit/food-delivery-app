@@ -75,14 +75,8 @@
           <span>{{ userRole === 'RESTAURANT' ? (restaurantName || displayName) : displayName }}</span>
           <i class="fas fa-chevron-down"></i>
 
-          <!-- Profile Dropdown -->
+          <!-- Profile Dropdown - Orders and Menu removed -->
           <div class="profile-dropdown" *ngIf="showProfileMenu">
-            <button (click)="goToOrders(); showProfileMenu=false">
-              <i class="fas fa-box"></i> Orders
-            </button>
-            <button (click)="goToMenu(); showProfileMenu=false">
-              <i class="fas fa-utensils"></i> Menu
-            </button>
             <button (click)="goToProfile(); showProfileMenu=false">
               <i class="fas fa-user"></i> Profile
             </button>

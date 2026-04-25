@@ -1,59 +1,85 @@
-/* HEADER */
+/* ===== PAGE WRAPPER ===== */
+.page {
+ padding-top: 120px !important;
+ position: relative;
+ overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
 .menu-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  margin-top: 20px;
   margin-bottom: 30px;
+  position: relative;
+  z-index: 100;
 }
 
 .menu-header span {
   color: #FFD700;
 }
 
-/* TITLE */
+.menu-header > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ===== TITLE ===== */
 .menu-title {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+}
+
+.menu-title h1 {
+  font-size: 52px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
 }
 
 .menu-title p {
   color: #aaa;
+  font-size: 18px;
 }
 
-/* GRID LAYOUT FOR MENU ITEMS */
+/* ===== GRID ===== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
 }
 
-/* CARD STYLES */
+/* ===== CARD ===== */
 .card {
-  background: rgba(255,255,255,0.05);
-  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,215,0,0.08);
+  border-radius: 18px;
   padding: 0;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: 0.3s;
+  backdrop-filter: blur(10px);
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(255,215,0,0.08);
 }
 
-/* IMAGE CONTAINER - LARGER SIZE */
+/* ===== IMAGE ===== */
 .item-image-container {
   width: 100%;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
-  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  background: #111;
 }
 
 .item-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: 0.3s;
 }
 
 .card:hover .item-image {
@@ -67,157 +93,176 @@
   align-items: center;
   justify-content: center;
   font-size: 64px;
-  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-  color: rgba(255, 215, 0, 0.3);
+  color: rgba(255, 215, 0, 0.25);
+  background: #111;
 }
 
-/* CARD CONTENT */
+/* ===== CARD CONTENT ===== */
 .card-content {
-  padding: 20px;
+  padding: 22px;
 }
 
 .card h3 {
-  margin: 0 0 10px 0;
-  font-size: 20px;
+  margin: 0 0 10px;
+  font-size: 24px;
   color: #fff;
+  font-weight: 700;
 }
 
 .card p {
   color: #aaa;
-  margin-bottom: 15px;
-  line-height: 1.5;
+  margin-bottom: 18px;
+  line-height: 1.6;
 }
 
-/* CARD BOTTOM */
+/* ===== CARD BOTTOM ===== */
 .card-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
 }
 
 .card-bottom span {
   color: #FFD700;
-  font-weight: bold;
-  font-size: 20px;
+  font-weight: 700;
+  font-size: 26px;
 }
 
-/* BUTTON STYLES */
+/* ===== BUTTONS ===== */
 .btn-outline {
   background: transparent;
   border: 1px solid #FFD700;
   color: #FFD700;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-right: 10px;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: 0.3s;
 }
 
 .btn-gold {
   background: #FFD700;
   border: none;
   color: #000;
-  padding: 8px 20px;
-  border-radius: 6px;
+  padding: 10px 22px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  transition: 0.3s;
 }
 
-.btn-gold:hover, .btn-outline:hover {
-  opacity: 0.8;
-  transform: scale(1.02);
+.btn-gold:hover,
+.btn-outline:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
 }
 
-/* EMPTY */
+/* ===== EMPTY ===== */
 .empty {
   text-align: center;
-  margin-top: 60px;
+  margin-top: 80px;
   color: #aaa;
+  font-size: 18px;
 }
 
-/* CART */
+/* ===== CART SIDEBAR ===== */
 .cart {
   position: fixed;
-  right: -320px;
   top: 0;
+  right: -350px !important; /* keep hidden*/
   width: 320px;
-  height: 100%;
-  background: #111;
-  padding: 20px;
-  transition: 0.3s;
-  z-index: 1000;
-  box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+  height: 100vh;
+  background: #0d0d0d;
+  border-left: 1px solid rgba(255,215,0,0.1);
+  padding: 30px 25px;
+  transition: right 0.35s ease;
+  z-index: 9999;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+  overflow-y: auto;
 }
 
 .cart.open {
-  right: 0;
+  right: 0 !important; 
 }
 
+/* ===== CART HEADER ===== */
 .cart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #333;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #222;
+  padding-bottom: 15px;
 }
 
-.cart-header button {
+.cart-header h3 {
+  color: #fff;
+  font-size: 24px;
+}
+
+.close-cart {
   background: none;
   border: none;
-  color: white;
-  font-size: 24px;
+  color: #FFD700;
+  font-size: 30px;
   cursor: pointer;
 }
 
+/* ===== CART ITEM ===== */
 .cart-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  background: rgba(255,255,255,0.05);
-  padding: 12px;
-  border-radius: 8px;
-}
-
-.cart-item div:first-child {
-  flex: 1;
+  background: rgba(255,255,255,0.04);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 14px;
 }
 
 .cart-item p {
-  margin: 0 0 5px 0;
-  font-weight: bold;
+  margin: 0;
+  font-weight: 600;
+  color: #fff;
 }
 
 .cart-item small {
   color: #FFD700;
 }
 
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .cart-item button {
   background: #FFD700;
   border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  margin: 0 3px;
 }
 
+/* ===== CART FOOTER ===== */
 .cart-footer {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid #333;
+  margin-top: 30px;
+  border-top: 1px solid #222;
+  padding-top: 20px;
 }
 
 .cart-footer h4 {
-  margin-bottom: 15px;
-  font-size: 18px;
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 22px;
 }
 
 .cart-footer .btn-gold {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
+  font-size: 16px;
 }
+
+
+

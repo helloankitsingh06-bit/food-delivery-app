@@ -1,0 +1,172 @@
+/* ===== GLOBAL PAGE STYLE ===== */
+.payment-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #141414 0%, #070707 100%);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  padding: 40px 20px;
+}
+
+/* ===== HEADER ===== */
+.payment-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.payment-header h1 {
+  font-size: 42px;
+  font-weight: 800;
+  color: #FFD700;
+  letter-spacing: 1px;
+}
+
+.payment-header p {
+  color: #bbbbbb;
+  font-size: 14px;
+}
+
+/* ===== CARD BASE STYLE ===== */
+.bill-card,
+.payment-card {
+  background: linear-gradient(145deg, #111111, #0b0b0b);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  border-radius: 18px;
+  padding: 25px;
+  margin: 20px auto;
+  max-width: 900px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  transition: 0.3s ease;
+}
+
+.bill-card:hover,
+.payment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(255, 215, 0, 0.1);
+}
+
+/* ===== SECTION HEADINGS ===== */
+h2 {
+  color: #FFD700;
+  margin-bottom: 20px;
+  font-size: 22px;
+  border-left: 4px solid #FFD700;
+  padding-left: 10px;
+}
+
+/* ===== TABLE ===== */
+.bill-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.bill-table th,
+.bill-table td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.bill-table th {
+  color: #FFD700;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.bill-table td {
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+/* ===== TOTAL BOX ===== */
+.total-box {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.total {
+  color: #FFD700;
+  font-size: 20px;
+}
+
+/* ===== PAYMENT OPTIONS ===== */
+.option {
+  display: block;
+  margin: 12px 0;
+  font-size: 15px;
+  cursor: pointer;
+  color: #ddd;
+}
+
+.option input {
+  margin-right: 10px;
+  accent-color: #FFD700;
+}
+
+/* ===== UPI BOX ===== */
+.upi-box {
+  margin-top: 10px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(255, 215, 0, 0.4);
+}
+
+.upi-box label {
+  display: block;
+  margin: 10px 0;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.upi-box input {
+  margin-right: 8px;
+  accent-color: #FFD700;
+}
+
+/* ===== ACTION BUTTON ===== */
+.action-section {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #FFD700, #caa300);
+  color: #000;
+  border: none;
+  padding: 14px 35px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+}
+
+.confirm-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.35);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .payment-header h1 {
+    font-size: 32px;
+  }
+
+  .bill-card,
+  .payment-card {
+    padding: 18px;
+  }
+
+  .total-box {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}

@@ -96,24 +96,10 @@ export class MenuComponent implements OnInit {
       alert('Your cart is empty!');
       return;
     }
+     localStorage.setItem('checkout_cart', JSON.stringify(this.cart));
+     localStorage.setItem('checkout_total', JSON.stringify(this.getCartTotal()));
 
-    const orderData = {
-      items: this.cart.map(item => item.name),
-      totalPrice: this.getCartTotal(),
-      status: 'PLACED'
-    };
-
-    this.httpService.placeOrder(this.restaurantId, orderData).subscribe({
-      next: (response) => {
-        alert('Order placed successfully!');
-        this.cart = [];
-        this.saveCart();
-        this.router.navigate(['/orders']);
-      },
-      error: (error) => {
-        alert('Failed to place order. Please try again.');
-      }
-    });
+    this.router.navigate(['/payment']);
   }
 
   toggleCart(): void {
@@ -124,15 +110,20 @@ export class MenuComponent implements OnInit {
     this.showCart = false;
   }
 
-  goBack(): void {
+    goBack(): void {
     this.router.navigate(['/restaurants']);
   }
 
   addMenuItem(): void {
     const name = prompt('Enter item name:');
     const price = prompt('Enter item price:');
+
     if (name && price) {
-      const newItem = { name, price: parseFloat(price) };
+      const newItem = {
+        name,
+        price: parseFloat(price)
+      };
+
       this.httpService.addMenuItem(this.restaurantId, newItem).subscribe({
         next: () => {
           alert('Menu item added successfully!');

@@ -74,7 +74,6 @@ public class Menu {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-        this.available = quantity > 0; // ✅ auto update availability
     }
 
     public boolean isAvailable() {

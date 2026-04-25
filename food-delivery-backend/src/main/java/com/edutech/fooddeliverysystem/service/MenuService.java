@@ -48,6 +48,7 @@ public class MenuService {
         menu.setPrice(updatedMenu.getPrice());
         menu.setDescription(updatedMenu.getDescription());
         menu.setQuantity(updatedMenu.getQuantity());
+        menu.setAvailable(updatedMenu.isAvailable());
         
         // Only update imageUrl if provided
         if (updatedMenu.getImageUrl() != null) {

@@ -1,0 +1,114 @@
+<div class="payment-page">
+
+  <!-- HEADER -->
+  <div class="payment-header">
+    <h1>Payment</h1>
+    <p>Review your order and complete payment</p>
+  </div>
+
+  <!-- BILL SECTION -->
+  <div class="bill-card">
+
+    <h2>Bill Summary</h2>
+
+    <table class="bill-table">
+      <thead>
+        <tr>
+          <th>Item Name</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of cartItems">
+          <td>{{ item.name }}</td>
+          <td>₹{{ item.price }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>₹{{ item.price * item.quantity }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="total-box">
+      <span>Total Amount:</span>
+      <span class="total">₹{{ totalPrice }}</span>
+    </div>
+
+  </div>
+
+  <!-- PAYMENT OPTIONS -->
+  <div class="payment-card">
+
+    <h2>Payment Method</h2>
+
+    <!-- COD -->
+    <label class="option">
+      <input
+        type="radio"
+        name="payment"
+        [(ngModel)]="selectedPaymentMethod"
+        value="COD"
+      />
+      Cash on Delivery (COD)
+    </label>
+
+    <!-- UPI -->
+    <label class="option">
+      <input
+        type="radio"
+        name="payment"
+        [(ngModel)]="selectedPaymentMethod"
+        value="UPI"
+      />
+      UPI Payment
+    </label>
+
+    <!-- UPI OPTIONS -->
+    <div class="upi-box" *ngIf="selectedPaymentMethod === 'UPI'">
+
+      <label>
+        <input
+          type="radio"
+          name="upi"
+          [(ngModel)]="selectedUPI"
+          value="GPay"
+        />
+        Google Pay (GPay)
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="upi"
+          [(ngModel)]="selectedUPI"
+          value="PhonePe"
+        />
+        PhonePe
+      </label>
+
+      <label>
+        <input
+          type="radio"
+          name="upi"
+          [(ngModel)]="selectedUPI"
+          value="Paytm"
+        />
+        Paytm
+      </label>
+
+    </div>
+
+  </div>
+
+  <!-- ACTION BUTTON -->
+  <div class="action-section">
+
+    <button class="confirm-btn" (click)="placeFinalOrder()">
+      Confirm Order & Pay ₹{{ totalPrice }}
+    </button>
+
+  </div>
+
+</div>

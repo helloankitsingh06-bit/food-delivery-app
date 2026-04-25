@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { HttpService } from '../services/http.service';
-import { filter } from 'rxjs/operators';
+import { filter, Subject, takeUntil, of } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -13,18 +13,30 @@ import { filter } from 'rxjs/operators';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
 
+  // ================= CLEANUP =================
+  private destroy$ = new Subject<void>();
+
+  // ================= USER DATA =================
   user: any = {};
   restaurant: any = null;
+
   isLoading = true;
-  isEditing = false;
+
+  // ================= EDIT STATES =================
+  isEditingAccount = false;
+  isEditingRestaurant = false;
+  isEditingDelivery = false;
+
+  // ================= UI =================
   errorMessage = '';
   successMessage = '';
 
-  displayName: string = '';
-  displayRole: string = '';
+  displayName = '';
+  displayRole = '';
 
+  // ================= FORMS =================
   userForm = {
     name: '',
     email: '',
@@ -39,21 +51,65 @@ export class ProfileComponent implements OnInit {
     address: '',
     cuisine: '',
     imageUrl: '',
-    rating: 0
+    rating: 0,
+    phone: '',
+    altPhone: '',
+    email: '',
+    gstNumber: '',
+    mapLink: '',
+    openTime: '',
+    closeTime: '',
+    isOpen: true,
+    deliveryAvailable: true,
+    costForTwo: 0,
+    licenseNumber: ''
   };
 
+  // ================= PASSWORD =================
+  showPasswordForm = false;
+  showCurrentPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
+
+  passwordForm = {
+    current: '',
+    new: '',
+    confirm: ''
+  };
+
+  // ================= EXTRA =================
+  addresses: string[] = [];
+
+  totalOrders = 0;
+  totalSpent = 0;
+  todayEarnings = 0;
+  completedDeliveries = 0;
+
+  // ================= CONSTRUCTOR =================
   constructor(
     private authService: AuthService,
     private httpService: HttpService,
     private router: Router
   ) {}
 
+  // ================= INIT =================
   ngOnInit() {
     this.loadData();
+    this.listenToRouteChanges();
+  }
 
-    // 🔥 IMPORTANT: reload data whenever user comes back to profile
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ================= ROUTE LISTENER =================
+  private listenToRouteChanges() {
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(
+        filter(e => e instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
       .subscribe(() => {
         if (this.router.url === '/profile') {
           this.loadData();
@@ -61,143 +117,307 @@ export class ProfileComponent implements OnInit {
       });
   }
 
+  // ================= LOAD DATA =================
   loadData() {
     this.isLoading = true;
+
+    // Try getting user from authService, fallback to localStorage
     this.user = this.authService.getCurrentUser();
 
-    console.log('User:', this.user);
+    // CRITICAL FIX: If user is null/undefined, try localStorage directly
+    if (!this.user) {
+      try {
+        const raw = localStorage.getItem('user');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          // Handle nested user object: { data: { user: {...} } } or { user: {...} } or flat
+          this.user = parsed?.data?.user || parsed?.user || parsed || null;
+        }
+      } catch {
+        this.user = null;
+      }
+    }
 
     if (!this.user) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.displayRole = this.user.role;
+    // CRITICAL FIX: Unwrap nested user if needed
+    if (this.user.data) {
+      this.user = this.user.data.user || this.user.data || this.user;
+    }
 
-    // ✅ RESTAURANT USER
-    if (this.user.role === 'RESTAURANT') {
-      this.httpService.getRestaurantByOwnerId(this.user.id).subscribe({
-        next: (restaurant) => {
-          console.log('Restaurant API response:', restaurant);
+    console.log('USER LOADED 👉', this.user);
 
-          this.restaurant = restaurant;
+    this.displayRole = this.user.role || '';
+    this.addresses = this.getStoredAddresses();
 
-          if (restaurant) {
-            this.restaurantForm = {
-              id: restaurant.id,
-              name: restaurant.name || '',
-              location: restaurant.location || '',
-              address: restaurant.address || '',
-              cuisine: restaurant.cuisine || '',
-              imageUrl: restaurant.imageUrl || '',
-              rating: restaurant.rating || 0
-            };
+    // Populate userForm immediately so account section always shows data
+    this.userForm = {
+      name: this.user.name || this.user.fullName || '',
+      email: this.user.email || '',
+      phone: this.user.phone || this.user.phoneNumber || '',
+      address: this.user.address || ''
+    };
 
-            this.displayName = restaurant.name || 'Restaurant';
-          } else {
-            this.displayName = this.user.username || this.user.name;
-          }
+    this.displayName = this.userForm.name || this.user.email || 'User';
 
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching restaurant:', err);
-          this.displayName = this.user.username || this.user.name;
-          this.isLoading = false;
-        }
-      });
+    const role = (this.user.role || '').toUpperCase();
 
+    if (role === 'RESTAURANT') {
+      this.loadRestaurant();
+      this.loadRestaurantStats();
+      this.isLoading = false;
+    } else if (role === 'CUSTOMER') {
+      this.loadCustomerStats();
+      this.isLoading = false;
+    } else if (role === 'DELIVERY' || role === 'DELIVERY_PARTNER') {
+      this.loadDeliveryStats();
+      this.isLoading = false;
     } else {
-      // ✅ CUSTOMER / DELIVERY
-      this.userForm = {
-        name: this.user.name || '',
-        email: this.user.email || '',
-        phone: this.user.phone || '',
-        address: this.user.address || ''
-      };
-
-      this.displayName = this.user.name || 'User';
+      // Unknown role — still show account info
       this.isLoading = false;
     }
   }
 
-  toggleEdit() {
-    this.isEditing = !this.isEditing;
-    this.errorMessage = '';
-    this.successMessage = '';
+  // ================= LOCAL STORAGE =================
+  private getStoredAddresses(): string[] {
+    try {
+      return JSON.parse(localStorage.getItem('addresses') || '[]');
+    } catch {
+      return [];
+    }
   }
 
-  // ✅ UPDATE CUSTOMER
+  // ================= RESTAURANT =================
+  loadRestaurant() {
+    this.httpService.getRestaurantByOwnerId(this.user.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (r: any) => {
+          console.log('RESTAURANT RAW 👉', r);
+
+          if (!r) {
+            this.restaurant = null;
+            return;
+          }
+
+          // Handle nested response: { data: {...} } or flat
+          const data = r.data || r;
+
+          this.restaurantForm = {
+            id: data.id || data.restaurantId || null,
+            name: data.name || data.restaurantName || '',
+            location: data.location || data.city || '',
+            address: data.address || '',
+            cuisine: data.cuisine || data.cuisineType || '',
+            imageUrl: data.imageUrl || data.image || data.logo || '',
+            rating: data.rating || data.averageRating || 0,
+            phone: data.phone || data.phoneNumber || data.contactNumber || '',
+            altPhone: data.altPhone || data.alternatePhone || '',
+            email: data.email || data.contactEmail || '',
+            gstNumber: data.gstNumber || data.gst || '',
+            mapLink: data.mapLink || data.googleMapLink || '',
+            openTime: data.openTime || data.openingTime || '',
+            closeTime: data.closeTime || data.closingTime || '',
+            isOpen: data.isOpen ?? data.open ?? true,
+            deliveryAvailable: data.deliveryAvailable ?? data.delivery ?? true,
+            costForTwo: data.costForTwo || data.averageCost || 0,
+            licenseNumber: data.licenseNumber || data.fssaiNumber || ''
+          };
+
+          // CRITICAL: restaurant object drives the VIEW mode
+          this.restaurant = { ...this.restaurantForm };
+          this.displayName = this.restaurant.name || this.userForm.name || 'Restaurant';
+
+          console.log('RESTAURANT MAPPED 👉', this.restaurant);
+        },
+        error: (err) => {
+          console.error('Restaurant load error:', err);
+          this.restaurant = null;
+        }
+      });
+  }
+
+  // ================= SAFE API WRAPPER =================
+  private safeCall(api: any, fallback: any = {}) {
+    return (api && typeof api.subscribe === 'function') ? api : of(fallback);
+  }
+
+  // ================= STATS =================
+  loadCustomerStats() {
+    this.safeCall(this.httpService.getCustomerStats?.())
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res: any) => {
+        this.totalOrders = res?.totalOrders ?? 0;
+        this.totalSpent = res?.totalSpent ?? 0;
+      });
+  }
+
+  loadRestaurantStats() {
+    this.safeCall(this.httpService.getRestaurantStats?.(this.user.id))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res: any) => {
+        this.totalOrders = res?.totalOrders ?? 0;
+      });
+  }
+
+  loadDeliveryStats() {
+    this.safeCall(this.httpService.getDeliveryStats?.())
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res: any) => {
+        this.todayEarnings = res?.todayEarnings ?? 0;
+        this.completedDeliveries = res?.completedDeliveries ?? 0;
+      });
+  }
+
+  // ================= VALIDATION =================
+  private isValidPhone(p: string): boolean {
+    return /^[0-9]{10}$/.test(p.trim());
+  }
+
+  // ================= UPDATE USER =================
   updateCustomerProfile() {
-    this.httpService.updateUser(this.user.id, this.userForm).subscribe({
-      next: () => {
-        const updatedUser = { ...this.user, ...this.userForm };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-
-        this.user = updatedUser;
-        this.displayName = updatedUser.name;
-
-        this.showSuccess('Profile updated successfully!');
-        this.isEditing = false;
-      },
-      error: (error) => {
-        this.showError(error.error?.message || 'Failed to update profile');
-      }
-    });
-  }
-
-  // ✅ UPDATE RESTAURANT
-  updateRestaurantProfile() {
-    if (!this.restaurantForm.id) {
-      this.showError('No restaurant found to update');
+    if (this.userForm.phone && !this.isValidPhone(this.userForm.phone)) {
+      this.showError('Phone must be 10 digits');
       return;
     }
 
-    this.httpService.updateRestaurant(this.restaurantForm.id, this.restaurantForm).subscribe({
-      next: (response) => {
-        this.restaurant = response;
-        this.displayName = response.name;
+    this.httpService.updateUser(this.user.id, this.userForm)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          const updatedUser = { ...this.user, ...this.userForm };
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          this.user = updatedUser;
+          this.displayName = updatedUser.name || updatedUser.fullName || this.displayName;
+          this.showSuccess('Profile updated successfully!');
+          this.isEditingAccount = false;
+          this.isEditingDelivery = false;
+        },
+        error: () => this.showError('Update failed. Please try again.')
+      });
+  }
 
-        this.showSuccess('Restaurant updated successfully!');
-        this.isEditing = false;
+  // ✅ Added explicit updateUserProfile method (calls updateCustomerProfile)
+  updateUserProfile() {
+    this.updateCustomerProfile();
+  }
 
-        // 🔥 reload fresh data
-        this.loadData();
+  // ================= UPDATE RESTAURANT =================
+  updateRestaurantProfile() {
+    if (!this.restaurantForm.id) {
+      this.showError('Restaurant ID missing');
+      return;
+    }
+
+    if (this.restaurantForm.phone && !this.isValidPhone(this.restaurantForm.phone)) {
+      this.showError('Phone must be 10 digits');
+      return;
+    }
+
+    this.httpService.updateRestaurant(this.restaurantForm.id, this.restaurantForm)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          const data = res?.data || res;
+          this.restaurant = { ...this.restaurantForm, ...data };
+          this.displayName = this.restaurant.name || this.displayName;
+          this.showSuccess('Restaurant updated successfully!');
+          this.isEditingRestaurant = false;
+        },
+        error: () => this.showError('Update failed. Please try again.')
+      });
+  }
+
+  // ================= FIXED PASSWORD CHANGE =================
+  changePassword() {
+    if (!this.passwordForm.current) {
+      this.showError('Please enter your current password');
+      return;
+    }
+    if (!this.passwordForm.new || this.passwordForm.new.length < 6) {
+      this.showError('New password must be at least 6 characters');
+      return;
+    }
+    if (this.passwordForm.new !== this.passwordForm.confirm) {
+      this.showError('Passwords do not match');
+      return;
+    }
+
+    this.httpService.changePassword(this.user.id, {
+      currentPassword: this.passwordForm.current,
+      newPassword: this.passwordForm.new
+    }).subscribe({
+      next: () => {
+        this.showSuccess('Password changed successfully');
+        this.passwordForm = { current: '', new: '', confirm: '' };
+        this.showPasswordForm = false;
       },
-      error: (error) => {
-        this.showError(error.error?.message || 'Failed to update restaurant');
+      error: (err) => {
+        const msg = err.error?.message || err.error || 'Failed to change password';
+        this.showError(msg);
       }
     });
   }
 
-  // ✅ DELETE RESTAURANT
-  deleteRestaurant() {
-    if (!this.restaurantForm.id) return;
+  // ================= IMAGE UPLOAD =================
+  onUserImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.user.avatar = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 
-    if (confirm('⚠️ Are you sure you want to delete your restaurant?')) {
-      this.httpService.deleteRestaurant(this.restaurantForm.id).subscribe({
-        next: () => {
-          this.showSuccess('Restaurant deleted successfully!');
-          
-          this.restaurant = null; // 🔥 clear UI instantly
+  onRestaurantImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.restaurantForm.imageUrl = e.target.result;
+      if (this.restaurant) this.restaurant.imageUrl = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 
-          setTimeout(() => {
-            this.router.navigate(['/create-restaurant']);
-          }, 1500);
-        },
-        error: (error) => {
-          this.showError(error.error?.message || 'Failed to delete restaurant');
-        }
-      });
+  // ================= ADDRESS =================
+  addAddress() {
+    const addr = prompt('Enter new address:');
+    if (addr && addr.trim()) {
+      this.addresses.push(addr.trim());
+      localStorage.setItem('addresses', JSON.stringify(this.addresses));
+      this.showSuccess('Address added!');
     }
   }
 
+  deleteAddress(i: number) {
+    this.addresses.splice(i, 1);
+    localStorage.setItem('addresses', JSON.stringify(this.addresses));
+    this.showSuccess('Address removed');
+  }
+
+  // ================= HELPERS =================
+  getRoleLabel(): string {
+    const role = (this.user?.role || '').toUpperCase();
+    if (role === 'RESTAURANT') return 'Restaurant Owner';
+    if (role === 'DELIVERY' || role === 'DELIVERY_PARTNER') return 'Delivery Partner';
+    return 'Customer';
+  }
+
+  isRole(role: string): boolean {
+    return (this.user?.role || '').toUpperCase() === role.toUpperCase();
+  }
+
+  // ================= NAV =================
   goBack() {
-    if (this.user.role === 'RESTAURANT') {
-      this.router.navigate(['/orders']);
-    } else {
-      this.router.navigate(['/restaurants']);
-    }
+    const role = (this.user?.role || '').toUpperCase();
+    if (role === 'RESTAURANT') this.router.navigate(['/orders']);
+    else if (role === 'DELIVERY' || role === 'DELIVERY_PARTNER') this.router.navigate(['/deliveries']);
+    else this.router.navigate(['/restaurants']);
   }
 
   logout() {
@@ -205,16 +425,16 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  // ✅ MESSAGE HANDLING
-  private showSuccess(message: string) {
-    this.successMessage = message;
+  // ================= MESSAGES =================
+  private showSuccess(msg: string) {
+    this.successMessage = msg;
     this.errorMessage = '';
-    setTimeout(() => this.successMessage = '', 3000);
+    setTimeout(() => (this.successMessage = ''), 3500);
   }
 
-  private showError(message: string) {
-    this.errorMessage = message;
+  private showError(msg: string) {
+    this.errorMessage = msg;
     this.successMessage = '';
-    setTimeout(() => this.errorMessage = '', 3000);
+    setTimeout(() => (this.errorMessage = ''), 3500);
   }
 }

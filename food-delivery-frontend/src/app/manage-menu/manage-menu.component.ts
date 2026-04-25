@@ -23,7 +23,8 @@ export class ManageMenuComponent implements OnInit {
     price: 0,
     description: '',
     quantity: 0,
-    imageUrl: ''
+    imageUrl: '',
+    isAvailable: true
   };
 
   selectedFile: File | null = null;
@@ -107,16 +108,51 @@ export class ManageMenuComponent implements OnInit {
     console.log("EDIT CLICKED", item);
 
     this.menuItem = {
-      name: item.name,
-      price: item.price,
-      description: item.description,
-      quantity: item.quantity,
-      imageUrl: item.imageUrl
-    };
+        name: item.name,
+        price: item.price,
+        description: item.description,
+        quantity: item.quantity,
+        imageUrl: item.imageUrl,
+        available: item.available
+      };
 
     this.editId = item.id;
     this.isEditing = true;
   }
+
+  toggleStockStatus() {
+  if (!this.editId) {
+    this.errorMessage = "Please select an item first";
+    this.clearMessagesAfterDelay();
+    return;
+  }
+
+  const payload = {
+    name: this.menuItem.name,
+    price: this.menuItem.price,
+    description: this.menuItem.description,
+    quantity: this.menuItem.quantity,
+    imageUrl: this.menuItem.imageUrl,
+    available: !this.menuItem.available
+  };
+
+  this.http.updateMenuItem(this.editId, payload).subscribe({
+    next: () => {
+      this.successMessage = payload.available
+        ? "Marked as In Stock ✅"
+        : "Marked as Out of Stock ✅";
+
+      this.loadMenu();
+      this.resetForm();
+      this.clearMessagesAfterDelay();
+    },
+    error: (err) => {
+      console.error(err);
+      this.errorMessage = "Stock update failed ❌";
+      this.clearMessagesAfterDelay();
+    }
+  });
+}
 
   // ADD + UPDATE COMBINED WITH IMAGE UPLOAD FIX
   addItem() {
@@ -193,7 +229,8 @@ export class ManageMenuComponent implements OnInit {
         price: this.menuItem.price,
         description: this.menuItem.description,
         quantity: this.menuItem.quantity || 0,
-        imageUrl: this.menuItem.imageUrl || ''
+        imageUrl: this.menuItem.imageUrl || '',
+        available: true
       };
       
       console.log('Sending payload without image:', payload);
@@ -234,7 +271,8 @@ export class ManageMenuComponent implements OnInit {
       price: 0,
       description: '',
       quantity: 0,
-      imageUrl: ''
+      imageUrl: '',
+      available: true
     };
     this.selectedFile = null;
     this.isEditing = false;
@@ -270,3 +308,4 @@ export class ManageMenuComponent implements OnInit {
     window.history.back();
   }
 }
+
