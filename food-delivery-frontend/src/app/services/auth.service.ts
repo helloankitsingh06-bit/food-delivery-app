@@ -1,0 +1,123 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+  restaurantId?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  private apiUrl = 'http://localhost:8080/api';
+  private tokenKey = 'jwt_token';
+  private userKey = 'user_data';
+
+  private loggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private userRoleSubject = new BehaviorSubject<string>(this.getUserRole());
+
+  constructor(private http: HttpClient, private router: Router) {}
+
+  // ==================== OTP FLOW METHODS ====================
+  requestOtp(phone: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/request-otp`, { phone });
+  }
+
+  verifyOtp(phone: string, otp: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/verify-otp`, { phone, otp });
+  }
+
+  // Register using tempToken from OTP verification
+  registerWithTempToken(tempToken: string, userData: any): Observable<any> {
+    const payload = {
+      tempToken: tempToken,
+      username: userData.username,
+      name: userData.name,
+      email: userData.email,
+      password: userData.password,
+      role: userData.role
+    };
+    return this.http.post(`${this.apiUrl}/auth/register`, payload);
+  }
+
+  // ==================== EXISTING METHODS ====================
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/register`, userData);
+  }
+
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
+      tap((res: any) => {
+        if (res.token) {
+          localStorage.setItem(this.tokenKey, res.token);
+          localStorage.setItem(this.userKey, JSON.stringify(res.user));
+          this.loggedInSubject.next(true);
+          this.userRoleSubject.next(res.user.role);
+        }
+      })
+    );
+  }
+
+  logout(): void {
+    localStorage.clear();
+    this.loggedInSubject.next(false);
+    this.userRoleSubject.next('');
+    this.router.navigate(['/login']);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  getUser(): any {
+    const user = localStorage.getItem(this.userKey);
+    return user ? JSON.parse(user) : null;
+  }
+
+  // ✅ getCurrentUser() method - Fetches user from 'user' key in localStorage
+  getCurrentUser(): any {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      return JSON.parse(userStr);
+    }
+    return null;
+  }
+
+  getUserRole(): string {
+    const user = this.getCurrentUser();
+    return user ? user.role : '';
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getLoggedInStatus(): Observable<boolean> {
+    return this.loggedInSubject.asObservable();
+  }
+
+  getUserRoleObservable(): Observable<string> {
+    return this.userRoleSubject.asObservable();
+  }
+  
+  private hasToken(): boolean {
+    return !!localStorage.getItem(this.tokenKey);
+  }
+
+  // ==================== NEW METHOD ====================
+  // Get full user details including phone number from backend
+  getUserDetails(userId: number): Observable<any> {
+    const token = this.getToken();
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get(`${this.apiUrl}/users/${userId}`, { headers });
+  }
+}

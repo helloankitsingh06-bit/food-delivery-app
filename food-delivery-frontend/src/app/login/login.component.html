@@ -1,0 +1,135 @@
+<div class="login-container">
+
+  <!-- PARTICLES -->
+  <div class="particles">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="login-overlay"></div>
+
+  <div class="login-card" #card [class.success-mode]="loginSuccess">
+
+    <!-- 🔥 LOGIN UI -->
+    <div *ngIf="!loginSuccess" class="login-content">
+
+      <!-- LOTTIE -->
+      <div #lottie class="lottie-box"></div>
+
+      <!-- HEADER -->
+      <p class="tagline">Premium Food Delivery Experience</p>
+      <h2 class="login-heading">Welcome Back</h2>
+
+      <!-- FORM -->
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate>
+
+        <!-- EMAIL -->
+        <div class="form-group">
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="credentials.email"
+            required
+            email
+            #email="ngModel"
+            class="form-control"
+            placeholder="📧 Email"
+            autocomplete="email">
+          <small *ngIf="email.invalid && email.touched" class="error-text">
+            Enter valid email
+          </small>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="form-group password-group">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            [(ngModel)]="credentials.password"
+            required
+            minlength="4"
+            #password="ngModel"
+            class="form-control"
+            placeholder="🔒 Password"
+            autocomplete="current-password">
+          <span class="toggle-password" (click)="showPassword = !showPassword">
+            {{ showPassword ? '🙈' : '👁' }}
+          </span>
+          <small *ngIf="password.invalid && password.touched" class="error-text">
+            Min 4 characters
+          </small>
+        </div>
+
+        <!-- OPTIONS -->
+        <div class="login-options">
+          <label>
+            <input type="checkbox" [(ngModel)]="rememberMe" name="remember">
+            Remember me
+          </label>
+          <span class="forgot" (click)="openForgotModal()">Forgot?</span>
+        </div>
+
+        <!-- ERROR -->
+        <div *ngIf="errorMessage" class="alert-error">
+          {{ errorMessage }}
+        </div>
+
+        <!-- BUTTON -->
+        <button
+          type="submit"
+          class="btn-login"
+          [disabled]="loading || !loginForm.valid">
+          <span *ngIf="!loading">Login →</span>
+          <span *ngIf="loading">⏳ Logging...</span>
+        </button>
+
+      </form>
+
+      <!-- DIVIDER -->
+      <div class="divider"><span>OR</span></div>
+
+      <!-- 🔥 REGISTER SECTION -->
+      <div class="register-link">
+        <p class="new-text">New here?</p>
+        <a routerLink="/register" class="register-btn">
+          Create an account →
+        </a>
+      </div>
+
+    </div>
+
+    <!-- 🎉 SUCCESS SCREEN -->
+    <div *ngIf="loginSuccess" class="success-container">
+      <div #successLottie class="success-lottie"></div>
+      <h2>Welcome 🎉</h2>
+      <p>Logging you in...</p>
+    </div>
+
+  </div>
+
+  <!-- 🔥 FORGOT PASSWORD MODAL -->
+  <div class="modal-overlay" *ngIf="showForgotModal" (click)="closeForgotModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeForgotModal()">✕</button>
+      <div class="modal-icon">🔐</div>
+      <h3>Reset Password</h3>
+      <p>Enter your email address and we'll send you a link to reset your password.</p>
+      <input
+        type="email"
+        [(ngModel)]="resetEmail"
+        class="form-control modal-input"
+        placeholder="Your email"
+        autocomplete="email">
+      <button
+        class="btn-login modal-btn"
+        [disabled]="resetLoading"
+        (click)="sendResetLink()">
+        {{ resetLoading ? 'Sending...' : 'Send Reset Link →' }}
+      </button>
+      <div *ngIf="resetMessage" class="reset-message" [class.success]="resetSuccess">
+        {{ resetMessage }}
+      </div>
+    </div>
+  </div>
+
+</div>

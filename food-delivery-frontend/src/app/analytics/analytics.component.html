@@ -1,0 +1,285 @@
+<div class="an-root">
+
+  <!-- ══════════════════════════════════════════════
+       TOPBAR
+  ══════════════════════════════════════════════ -->
+  <header class="an-topbar">
+    <div class="an-topbar-left">
+      <h1 class="an-title">Analytics Overview</h1>
+      <div class="an-subtitle">
+        {{ lastUpdated | date:'EEEE, dd MMM yyyy' }}
+        <span class="an-live-dot" [class.an-live-dot--on]="isLive">
+          <span class="dot-pulse"></span>
+          Live Dashboard
+        </span>
+      </div>
+    </div>
+
+    <div class="an-topbar-right">
+
+      <!-- Date Range -->
+      <div class="an-range-group">
+        <button
+          *ngFor="let r of dateRanges"
+          class="an-range-btn"
+          [class.an-range-btn--active]="selectedRange === r.value"
+          (click)="selectedRange = r.value; onRangeChange()">
+          {{ r.label }}
+        </button>
+      </div>
+
+      <!-- Custom Date Picker -->
+      <div *ngIf="showCustomPicker" class="an-custom-picker">
+        <input type="date" class="an-date-input" [(ngModel)]="customFrom" placeholder="From">
+        <span class="an-date-sep">→</span>
+        <input type="date" class="an-date-input" [(ngModel)]="customTo" placeholder="To">
+        <button class="an-apply-btn" (click)="applyCustomRange()">Apply</button>
+      </div>
+
+      <!-- Refresh -->
+      <button class="an-refresh-btn" (click)="refresh()" [class.an-refresh-btn--spinning]="isRefreshing" title="Refresh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M23 4v6h-6M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+      </button>
+
+      <button class="an-back-btn" (click)="goBack()">← Back</button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════
+       LOADING
+  ══════════════════════════════════════════════ -->
+  <div *ngIf="isLoading" class="an-skeleton-grid">
+    <div class="an-skel an-skel--card" *ngFor="let i of [1,2,3,4]"></div>
+    <div class="an-skel an-skel--chart"></div>
+    <div class="an-skel an-skel--chart"></div>
+    <div class="an-skel an-skel--table"></div>
+    <div class="an-skel an-skel--list"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       MAIN DASHBOARD
+  ══════════════════════════════════════════════ -->
+  <main *ngIf="!isLoading" class="an-body">
+
+    <!-- ── STAT DONUTS ───────────────────────────── -->
+    <section class="an-stats-row">
+      <div *ngFor="let s of donutStats; let i = index"
+           class="an-stat-card"
+           [style.animation-delay]="(i * 80) + 'ms'">
+        <div class="an-donut-wrap">
+          <svg class="an-donut" viewBox="0 0 100 100">
+            <!-- Track -->
+            <circle class="donut-track" cx="50" cy="50" [attr.r]="DONUT_R"
+              fill="none" stroke-width="8"/>
+            <!-- Progress -->
+            <circle class="donut-progress" cx="50" cy="50" [attr.r]="DONUT_R"
+              fill="none" stroke-width="8"
+              [attr.stroke-dasharray]="s.circumference"
+              [attr.stroke-dashoffset]="s.offset"
+              stroke-linecap="round"
+              transform="rotate(-90 50 50)"/>
+          </svg>
+          <div class="an-donut-center">
+            <span class="an-donut-val">
+              {{ s.prefix || '' }}{{ formatValue(s.value) }}
+            </span>
+          </div>
+        </div>
+        <div class="an-stat-label">{{ s.label }}</div>
+        <div class="an-stat-trend" [ngClass]="getTrendClass(i === 0 ? stats.ordersTrend : i === 1 ? stats.customersTrend : i === 2 ? stats.revenueTrend : stats.completedTrend)">
+          <span>{{ (i === 0 ? stats.ordersTrend : i === 1 ? stats.customersTrend : i === 2 ? stats.revenueTrend : stats.completedTrend) >= 0 ? '↑' : '↓' }}</span>
+          {{ (i === 0 ? stats.ordersTrend : i === 1 ? stats.customersTrend : i === 2 ? stats.revenueTrend : stats.completedTrend) | number:'1.1-1' }}% vs yesterday
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CHARTS ROW ──────────────────────────────── -->
+    <section class="an-charts-row">
+
+      <!-- Sales Bar Chart -->
+      <div class="an-chart-card an-chart-card--wide">
+        <div class="an-chart-head">
+          <div>
+            <div class="an-chart-title">Sales Statistics</div>
+            <div class="an-chart-sub">Weekly food vs beverages</div>
+          </div>
+          <div class="an-legend">
+            <span class="an-legend-dot an-legend-dot--food"></span> Food
+            <span class="an-legend-dot an-legend-dot--bev"></span> Beverages
+          </div>
+        </div>
+
+        <div class="an-bar-chart">
+          <div class="an-bar-y-axis">
+            <span>{{ salesMax | number:'1.0-0' }}</span>
+            <span>{{ (salesMax * 0.75) | number:'1.0-0' }}</span>
+            <span>{{ (salesMax * 0.5) | number:'1.0-0' }}</span>
+            <span>{{ (salesMax * 0.25) | number:'1.0-0' }}</span>
+            <span>0</span>
+          </div>
+          <div class="an-bar-area">
+            <div class="an-bar-grid-lines">
+              <div class="an-grid-line" *ngFor="let g of [1,2,3,4]"></div>
+            </div>
+            <div class="an-bar-group" *ngFor="let d of salesData">
+              <div class="an-bars">
+                <div class="an-bar an-bar--food"
+                     [style.height.%]="getBarHeight(d.food)"
+                     [title]="'Food: ₹' + d.food">
+                  <div class="an-bar-tooltip">₹{{ d.food }}</div>
+                </div>
+                <div class="an-bar an-bar--bev"
+                     [style.height.%]="getBarHeight(d.beverages)"
+                     [title]="'Bev: ₹' + d.beverages">
+                  <div class="an-bar-tooltip">₹{{ d.beverages }}</div>
+                </div>
+              </div>
+              <div class="an-bar-label">{{ d.day }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Activity Line Chart -->
+      <div class="an-chart-card">
+        <div class="an-chart-head">
+          <div>
+            <div class="an-chart-title">Customer Activity</div>
+            <div class="an-chart-sub">Daily visitors this week</div>
+          </div>
+          <div class="an-legend">
+            <span class="an-legend-line"></span> Customers
+          </div>
+        </div>
+
+        <div class="an-line-chart-wrap">
+          <svg class="an-line-svg" viewBox="0 0 460 160" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffd700" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Area fill -->
+            <path [attr.d]="getAreaPath()" fill="url(#areaGrad)"/>
+            <!-- Line -->
+            <path [attr.d]="getActivityPath()"
+                  fill="none" stroke="#ffd700" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Dots -->
+            <g *ngFor="let dot of getActivityDots()">
+              <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="5"
+                      fill="#111" stroke="#ffd700" stroke-width="2.5"/>
+              <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="2"
+                      fill="#ffd700"/>
+            </g>
+          </svg>
+
+          <!-- X axis labels -->
+          <div class="an-line-x-labels">
+            <span *ngFor="let d of activityData">{{ d.day }}</span>
+          </div>
+
+          <!-- Y axis labels -->
+          <div class="an-line-y-labels">
+            <span>{{ activityMax | number:'1.0-0' }}</span>
+            <span>{{ ((activityMax + activityMin) / 2) | number:'1.0-0' }}</span>
+            <span>{{ activityMin | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── BOTTOM ROW ──────────────────────────────── -->
+    <section class="an-bottom-row">
+
+      <!-- Top Selling Items -->
+      <div class="an-panel">
+        <div class="an-panel-head">
+          <div class="an-chart-title">Top Selling Items</div>
+          <div class="an-chart-sub">Most ordered today</div>
+        </div>
+
+        <div class="an-top-items">
+          <div *ngFor="let item of topItems; let i = index" class="an-top-item">
+            <div class="an-top-rank">#{{ i + 1 }}</div>
+            <div class="an-top-emoji">{{ item.emoji }}</div>
+            <div class="an-top-info">
+              <div class="an-top-name">{{ item.name }}</div>
+              <div class="an-top-bar-wrap">
+                <div class="an-top-bar" [style.width.%]="getTopItemWidth(item.orders)"></div>
+              </div>
+              <div class="an-top-orders">{{ item.orders }} orders</div>
+            </div>
+            <div class="an-top-revenue">₹{{ formatValue(item.revenue) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="an-panel an-panel--wide">
+        <div class="an-panel-head">
+          <div>
+            <div class="an-chart-title">Recent Orders</div>
+            <div class="an-chart-sub">Latest transactions</div>
+          </div>
+          <!-- Status filter -->
+          <div class="an-order-filters">
+            <button *ngFor="let f of orderFilters"
+                    class="an-filter-btn"
+                    [class.an-filter-btn--active]="activeOrderFilter === f"
+                    (click)="activeOrderFilter = f">
+              {{ f === 'all' ? 'All' : f }}
+            </button>
+          </div>
+        </div>
+
+        <div class="an-orders-table">
+          <div class="an-orders-header">
+            <span>Customer</span>
+            <span>Order</span>
+            <span>Time</span>
+            <span>Amount</span>
+            <span>Status</span>
+          </div>
+
+          <div *ngIf="filteredOrders.length === 0" class="an-orders-empty">
+            No orders found for this filter.
+          </div>
+
+          <div *ngFor="let order of filteredOrders" class="an-order-row">
+            <div class="an-order-customer">
+              <div class="an-avatar" [style.background]="order.avatarColor">
+                {{ order.initials }}
+              </div>
+              <div>
+                <div class="an-order-name">{{ order.customerName }}</div>
+                <div class="an-order-id">{{ order.id }}</div>
+              </div>
+            </div>
+            <div class="an-order-items">{{ order.items }}</div>
+            <div class="an-order-time">{{ order.time }}</div>
+            <div class="an-order-amount">₹{{ order.amount }}</div>
+            <div class="an-order-status">
+              <span class="an-badge" [ngClass]="getStatusClass(order.status)">
+                {{ order.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="an-orders-footer">
+          <span>Auto-refreshes every 30s</span>
+          <span>Last updated: {{ lastUpdated | date:'hh:mm:ss a' }}</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

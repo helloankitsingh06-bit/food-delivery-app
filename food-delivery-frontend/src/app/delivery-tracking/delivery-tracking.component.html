@@ -1,0 +1,107 @@
+<div class="tracking-page">
+
+   <!-- Back Button -->
+  <button class="back-btn" (click)="goBack()">
+    ← Back to Restaurants
+  </button>
+
+  
+  <!-- Animated background -->
+  <div class="bg-glow"></div>
+
+  <div class="tracking-container">
+    <!-- Header -->
+    <div class="tracking-header">
+      <h1><i class="fas fa-motorcycle"></i> Live Tracking</h1>
+      <p>Real‑time order updates • Order #{{ orderId }}</p>
+      <div class="live-badge">
+        <span class="pulse-dot"></span> LIVE
+      </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="tracking-grid">
+
+      <!-- MAP SECTION -->
+      <div class="map-card">
+        <div id="tracking-map"></div>
+        <div class="progress-container">
+          <div class="progress-info">
+            <span>Delivery progress</span>
+            <strong>{{ progressPercent }}%</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width]="progressPercent + '%'"></div>
+          </div>
+        </div>
+        <div class="live-stats">
+          <span><i class="fas fa-tachometer-alt"></i> {{ remainingMinutes }}:{{ remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds }} remaining</span>
+          <span><i class="fas fa-map-marker-alt"></i> {{ distanceLeft.toFixed(1) }} km to you</span>
+        </div>
+      </div>
+
+      <!-- INFO SECTION -->
+      <div class="info-stack">
+
+        <!-- Rider card -->
+        <div class="glass-card rider-card">
+          <img [src]="rider.photo" alt="Rider">
+          <div class="rider-details">
+            <h3>{{ rider.name }}</h3>
+            <div class="rating">
+              <i class="fas fa-star"></i> {{ rider.rating }}
+              <span class="badge">★ Top Dasher</span>
+            </div>
+            <button class="call-btn" (click)="callRider()">
+              <i class="fas fa-phone-alt"></i> Call
+            </button>
+            <button class="msg-btn" (click)="messageRider()">
+              <i class="fas fa-comment-dots"></i> Message
+            </button>
+          </div>
+        </div>
+
+        <!-- Order timeline -->
+        <div class="glass-card timeline-card">
+          <h3><i class="fas fa-clock"></i> Order Progress</h3>
+          <div class="timeline">
+            <div *ngFor="let step of timelineSteps; let i = index" class="timeline-item" [class.completed]="step.completed">
+              <div class="timeline-icon" [class.completed]="step.completed">
+                <i [class]="'fas ' + step.icon"></i>
+              </div>
+              <div class="timeline-content">
+                <span class="label">{{ step.label }}</span>
+                <span class="time">{{ step.time }}</span>
+              </div>
+              <div *ngIf="i < timelineSteps.length - 1" class="timeline-line" [class.active]="step.completed"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ETA & Share -->
+        <div class="glass-card eta-card">
+          <div class="eta-main">
+            <i class="fas fa-hourglass-half"></i>
+            <div>
+              <span>Estimated arrival</span>
+              <h2>{{ etaMinutes }}:{{ etaSeconds < 10 ? '0' + etaSeconds : etaSeconds }}</h2>
+            </div>
+          </div>
+          <button class="share-btn" (click)="shareLiveLocation()">
+            <i class="fas fa-share-alt"></i> Share live location
+          </button>
+        </div>
+
+        <!-- Vehicle details -->
+        <div class="glass-card vehicle-card">
+          <i class="fas fa-motorcycle"></i>
+          <div>
+            <span>Delivery partner</span>
+            <strong>{{ rider.vehicle }}</strong>
+          </div>
+          <span class="live-dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

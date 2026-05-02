@@ -1,0 +1,197 @@
+<div class="page-wrapper">
+
+<!-- Back Button -->
+  <button
+    type="button"
+    class="back-btn"
+    (click)="goBack()">
+    ← Back to Orders
+  </button>
+
+  <h2>Manage Menu</h2>
+
+  <!-- FORM SECTION -->
+  <div class="menu-form">
+
+    <div class="form-grid">
+
+      <!-- Food Name -->
+      <div class="form-group">
+        <label>Food Name *</label>
+        <input
+          type="text"
+          name="name"
+          [(ngModel)]="menuItem.name"
+          placeholder="Enter food name"
+        >
+      </div>
+
+      <!-- Price -->
+      <div class="form-group">
+        <label>Price *</label>
+        <input
+          type="number"
+          name="price"
+          [(ngModel)]="menuItem.price"
+          placeholder="Enter price"
+        >
+      </div>
+
+      <!-- Description -->
+      <div class="form-group full-width">
+        <label>Description</label>
+        <textarea
+          name="description"
+          [(ngModel)]="menuItem.description"
+          placeholder="Enter food description"
+        ></textarea>
+      </div>
+
+      <!-- Quantity -->
+      <div class="form-group">
+        <label>Quantity Available</label>
+        <input
+          type="number"
+          name="quantity"
+          [(ngModel)]="menuItem.quantity"
+          placeholder="Available quantity"
+        >
+      </div>
+
+      <!-- Food Image -->
+      <div class="form-group">
+        <label>Food Image</label>
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+        >
+      </div>
+
+    </div>
+
+    <!-- SUCCESS / ERROR MESSAGES -->
+    <div *ngIf="successMessage" class="success-msg">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="error-msg">
+      {{ errorMessage }}
+    </div>
+
+    <!-- TOP BUTTONS -->
+    <div class="top-buttons">
+
+      <!-- Add / Update Button -->
+      <button
+        type="button"
+        class="submit-btn"
+        (click)="addItem()">
+        {{ isEditing ? 'Update Item' : 'Add Item' }}
+      </button>
+
+      <!-- Dynamic Stock Button -->
+      <button
+        *ngIf="isEditing"
+        type="button"
+        class="stock-btn"
+        (click)="toggleStockStatus()">
+
+        {{ menuItem.available ? 'Out of Stock' : 'In Stock' }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- MENU ITEMS SECTION -->
+  <h3>Menu Items</h3>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading">
+    Loading menu items...
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && menuList.length === 0" class="empty-state">
+    No menu items found. Add your first menu item above!
+  </div>
+
+  <!-- MENU CARDS -->
+  <div class="menu-container">
+
+    <ng-container *ngFor="let item of menuList">
+
+      <div class="menu-card">
+
+        <!-- Food Image -->
+        <div class="food-image-container">
+
+          <img
+            *ngIf="item.imageUrl"
+            [src]="'http://localhost:8080/images/' + item.imageUrl"
+            class="food-img"
+            [class.out-of-stock-image]="!item.available"
+            (error)="item.imageUrl = null"
+          >
+
+          <div
+            *ngIf="!item.imageUrl"
+            class="no-image-placeholder">
+            🍽️
+          </div>
+
+        </div>
+
+        <!-- Card Content -->
+        <div class="card-content">
+
+          <h4>{{ item.name }}</h4>
+
+          <p class="price">
+            ₹{{ item.price }}
+          </p>
+
+          <p>
+            {{ item.description }}
+          </p>
+
+          <p class="qty">
+            Available: {{ item.quantity }}
+          </p>
+
+          <!-- Show only when unavailable -->
+          <p
+            *ngIf="!item.available"
+            class="stock-status">
+            Out of Stock
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="actions">
+
+            <button
+              type="button"
+              class="edit-btn"
+              (click)="editItem(item)">
+              ✏ Edit
+            </button>
+
+            <button
+              type="button"
+              class="delete-btn"
+              (click)="deleteItem(item.id)">
+              🗑 Delete
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </ng-container>
+
+  </div>
+
+</div>

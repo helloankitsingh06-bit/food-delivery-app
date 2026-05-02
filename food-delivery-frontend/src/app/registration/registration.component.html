@@ -1,0 +1,120 @@
+<div class="register-container">
+  <div class="register-card">
+    <p class="tagline">Create your premium account</p>
+    <h2 class="register-heading">Sign Up</h2>
+
+    <!-- Error / success messages -->
+    <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="alert-success">{{ successMessage }}</div>
+
+    <!-- Step 1: Phone number input -->
+    <div *ngIf="step === 1">
+      <div class="form-group">
+        <input
+          type="tel"
+          [(ngModel)]="phone"
+          placeholder="📱 Phone number (+919876543210)"
+          pattern="^\+[0-9]{10,15}$"
+          class="form-control" />
+      </div>
+      <button (click)="requestOtp()" [disabled]="loading" class="btn-register">
+        {{ loading ? 'Sending...' : 'Send OTP →' }}
+      </button>
+    </div>
+
+    <!-- Step 2: OTP input -->
+    <div *ngIf="step === 2">
+      <div class="form-group">
+        <input
+          type="text"
+          [(ngModel)]="otp"
+          placeholder="🔑 Enter 6-digit OTP"
+          maxlength="6"
+          class="form-control" />
+      </div>
+      <button (click)="verifyOtp()" [disabled]="loading" class="btn-register">
+        {{ loading ? 'Verifying...' : 'Verify OTP →' }}
+      </button>
+      <button (click)="resetToPhone()" class="btn-link">Use different phone</button>
+    </div>
+
+    <!-- Step 3: Registration form (full profile) -->
+    <div *ngIf="step === 3">
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        <div class="form-group">
+          <input
+            type="text"
+            name="username"
+            [(ngModel)]="userData.username"
+            required
+            class="form-control"
+            placeholder="👤 Choose a username" />
+        </div>
+
+        <div class="form-group">
+          <input
+            type="text"
+            name="name"
+            [(ngModel)]="userData.name"
+            required
+            class="form-control"
+            placeholder="🧑 Enter your full name" />
+        </div>
+
+        <div class="form-group">
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="userData.email"
+            required
+            class="form-control"
+            placeholder="📧 Enter your email" />
+        </div>
+
+        <div class="form-group">
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="userData.password"
+            required
+            class="form-control"
+            placeholder="🔒 Create a password" />
+        </div>
+
+        <div class="form-group">
+          <select
+            name="role"
+            [(ngModel)]="userData.role"
+            required
+            class="form-control">
+            <option [ngValue]="null" disabled>Select Role</option>
+            <option *ngFor="let role of roles" [value]="role">
+              {{ role }}
+            </option>
+          </select>
+        </div>
+
+        <div *ngIf="successMessage" class="alert-success">
+          {{ successMessage }}
+        </div>
+
+        <div *ngIf="errorMessage" class="alert-error">
+          {{ errorMessage }}
+        </div>
+
+        <button type="submit" class="btn-register" [disabled]="loading">
+          {{ loading ? 'Registering...' : 'Create Account →' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <div class="login-link">
+      <p>Already have an account?</p>
+      <a routerLink="/login">Login here</a>
+    </div>
+  </div>
+</div>

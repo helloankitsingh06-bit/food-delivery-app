@@ -1,0 +1,479 @@
+/* ================= GLOBAL ================= */
+.payment-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, #0a0a0a, #000000);
+  padding: 40px 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.premium-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ================= HEADER ================= */
+.payment-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.payment-header h1 {
+  font-size: 48px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 10px;
+}
+
+.payment-header p {
+  color: rgba(255,255,255,0.7);
+  font-size: 16px;
+}
+
+/* ================= TWO COLUMN LAYOUT ================= */
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 900px) {
+  .two-column-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================= GLASS CARD ================= */
+.glass-card {
+  background: rgba(20,20,30,0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 28px;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(255,215,0,0.3);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.glass-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFD700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 3px solid #FFD700;
+  padding-left: 12px;
+}
+
+/* ================= ORDER SUMMARY ITEMS ================= */
+.cart-items-list {
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.cart-item-premium {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.item-image {
+  width: 55px;
+  height: 55px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #1a1a1a;
+  flex-shrink: 0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 15px;
+}
+
+.item-price {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.item-subtotal {
+  font-weight: 700;
+  color: #FFD700;
+}
+
+/* ================= BILL BREAKDOWN ================= */
+.bill-breakdown {
+  border-top: 1px solid rgba(255,215,0,0.1);
+  padding-top: 15px;
+}
+
+.break-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.break-row.discount {
+  color: #4caf50;
+}
+
+.grand-total {
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFD700;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,215,0,0.2);
+}
+
+/* ================= ADDRESS SECTION ================= */
+.address-section {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255,215,0,0.1);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #FFD700;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.edit-address-btn {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.edit-address-btn:hover {
+  background: rgba(255,215,0,0.2);
+  color: #FFD700;
+}
+
+.address-display {
+  background: rgba(0,0,0,0.3);
+  padding: 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  color: #ddd;
+}
+
+.address-editor {
+  display: flex;
+  gap: 10px;
+}
+
+.address-input {
+  flex: 1;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 40px;
+  padding: 10px 15px;
+  color: white;
+}
+
+.save-address-btn {
+  background: #FFD700;
+  border: none;
+  border-radius: 40px;
+  padding: 0 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ================= PROMO CODE ================= */
+.promo-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.promo-input {
+  flex: 1;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 40px;
+  padding: 12px 18px;
+  color: white;
+}
+
+.apply-promo, .remove-promo {
+  background: rgba(255,215,0,0.15);
+  border: 1px solid #FFD700;
+  border-radius: 40px;
+  padding: 0 20px;
+  color: #FFD700;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.apply-promo:hover, .remove-promo:hover {
+  background: #FFD700;
+  color: black;
+}
+
+.promo-message {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #4caf50;
+}
+
+.applied-badge {
+  margin-top: 10px;
+  background: rgba(76,175,80,0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #4caf50;
+  text-align: center;
+}
+
+/* ================= TIP SECTION ================= */
+.tip-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tip-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 40px;
+  padding: 8px 18px;
+  color: #ddd;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tip-btn.active {
+  background: #FFD700;
+  color: black;
+  border-color: #FFD700;
+}
+
+.custom-tip {
+  margin-top: 12px;
+}
+
+.tip-input {
+  width: 100%;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 40px;
+  padding: 10px 15px;
+  color: white;
+}
+
+/* ================= LOYALTY POINTS ================= */
+.loyalty-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #333;
+  transition: 0.3s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #FFD700;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.loyalty-discount {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #4caf50;
+}
+
+/* ================= PAYMENT METHODS ================= */
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.payment-option:hover {
+  background: rgba(255,215,0,0.08);
+  transform: translateX(5px);
+}
+
+.payment-option.selected {
+  background: rgba(255,215,0,0.12);
+  border-color: #FFD700;
+}
+
+.payment-option i:first-child {
+  font-size: 22px;
+  color: #FFD700;
+  width: 32px;
+}
+
+.check-icon {
+  margin-left: auto;
+  color: #4caf50;
+}
+
+.upi-apps, .card-details {
+  margin-top: 15px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(255,215,0,0.3);
+}
+
+.upi-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.upi-option img {
+  width: 28px;
+  height: 28px;
+}
+
+.upi-option.selected {
+  background: rgba(255,215,0,0.1);
+  color: #FFD700;
+}
+
+.card-input {
+  width: 100%;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 40px;
+  padding: 12px 15px;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.card-row {
+  display: flex;
+  gap: 12px;
+}
+
+.card-input.small {
+  flex: 1;
+}
+
+/* ================= CONFIRM BUTTON ================= */
+.confirm-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border: none;
+  padding: 16px;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 800;
+  color: black;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+}
+
+.confirm-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255,215,0,0.4);
+}
+
+.confirm-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ================= SCROLLBAR ================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: #FFD700;
+  border-radius: 10px;
+}

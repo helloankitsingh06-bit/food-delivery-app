@@ -1,0 +1,614 @@
+<div class="profile-wrapper">
+
+  <!-- ===== TOAST NOTIFICATIONS ===== -->
+  <div class="toast-stack">
+    <div *ngIf="successMessage" class="toast toast--success">
+      <span class="toast-icon">✓</span>
+      <span>{{ successMessage }}</span>
+    </div>
+    <div *ngIf="errorMessage" class="toast toast--error">
+      <span class="toast-icon">✕</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <!-- ===== TOPBAR ===== -->
+  <div class="topbar">
+    <button class="btn btn--ghost btn--icon" (click)="goBack()">
+      <span class="icon-arrow">←</span> Back
+    </button>
+    <div class="topbar-title">My Profile</div>
+    <button class="btn btn--danger-ghost" (click)="logout()">Logout</button>
+  </div>
+
+  <!-- ===== LOADING SKELETON ===== -->
+  <div *ngIf="isLoading" class="skeleton-page">
+    <div class="skeleton-hero"></div>
+    <div class="skeleton-card">
+      <div class="skeleton-line w60"></div>
+      <div class="skeleton-line w40"></div>
+      <div class="skeleton-line w80"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-line w50"></div>
+      <div class="skeleton-line w70"></div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div *ngIf="!isLoading" class="profile-body">
+
+    <!-- ===== HERO CARD ===== -->
+  <!-- ===== HERO CARD ===== -->
+<div class="hero-card">
+  <div class="hero-bg"></div>
+
+  <div class="hero-content">
+    
+    <div class="avatar-wrap">
+      <img
+        [src]="user?.avatar || 'assets/default-avatar.png'"
+        class="avatar-img"
+        alt="Avatar"
+        onerror="this.src='https://ui-avatars.com/api/?name=' + encodeURIComponent(displayName) + '&background=ff6b35&color=fff&size=128'"
+      >
+      <label class="avatar-upload-btn" title="Change photo">
+        <span>📷</span>
+        <input type="file" accept="image/*" (change)="onUserImageSelected($event)" hidden>
+      </label>
+    </div>
+
+    <div class="hero-info">
+      <h1 class="hero-name">{{ displayName || 'User' }}</h1>
+      <p class="hero-email">{{ user?.email || '—' }}</p>
+
+      <span class="role-badge role-badge--{{ (user?.role || 'user') | lowercase }}">
+        {{ getRoleLabel() }}
+      </span>
+
+      <!-- ✅ NEW PROFESSIONAL META INFO -->
+      <div class="hero-meta">
+        <div class="meta-item">
+          <span class="meta-label">Member Since</span>
+          <span class="meta-value">
+            {{ user?.createdAt ? (user?.createdAt | date:'MMM yyyy') : '—' }}
+          </span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Last Login</span>
+          <span class="meta-value">
+            {{ user?.lastLogin ? (user?.lastLogin | date:'dd MMM, hh:mm a') : '—' }}
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+    <!-- ===== ACCOUNT SECTION ===== -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="section-icon">👤</span>
+          <h2>Account Information</h2>
+        </div>
+        <button class="btn btn--outline btn--sm" (click)="isEditingAccount = !isEditingAccount">
+          {{ isEditingAccount ? 'Cancel' : 'Edit' }}
+        </button>
+      </div>
+
+      <div class="fields-grid">
+
+        <div class="field-row">
+          <label class="field-label">Full Name</label>
+          <div *ngIf="!isEditingAccount" class="field-value">{{ user?.name || userForm.name || '—' }}</div>
+          <input *ngIf="isEditingAccount" class="field-input" [(ngModel)]="userForm.name" placeholder="Your name">
+        </div>
+
+        <div class="field-row">
+          <label class="field-label">Email</label>
+          <div *ngIf="!isEditingAccount" class="field-value">{{ user?.email || userForm.email || '—' }}</div>
+          <input *ngIf="isEditingAccount" class="field-input" [(ngModel)]="userForm.email" placeholder="Email address" type="email">
+        </div>
+
+        <div class="field-row">
+          <label class="field-label">Phone</label>
+          <div *ngIf="!isEditingAccount" class="field-value">{{ user?.phone || user?.phoneNumber || userForm.phone || '—' }}</div>
+          <input *ngIf="isEditingAccount" class="field-input" [(ngModel)]="userForm.phone" placeholder="10-digit phone" maxlength="10">
+        </div>
+
+        <div class="field-row field-row--full">
+          <label class="field-label">Address</label>
+          <div *ngIf="!isEditingAccount" class="field-value">{{ user?.address || userForm.address || '—' }}</div>
+          <textarea *ngIf="isEditingAccount" class="field-input field-textarea" [(ngModel)]="userForm.address" placeholder="Your address" rows="2"></textarea>
+        </div>
+
+      </div>
+
+      <div *ngIf="isEditingAccount" class="section-actions">
+        <button class="btn btn--primary" (click)="updateCustomerProfile()">Save Changes</button>
+        <button class="btn btn--ghost" (click)="isEditingAccount = false">Cancel</button>
+      </div>
+    </div>
+
+    <!-- ===== CUSTOMER SECTION ===== -->
+    <div *ngIf="isRole('CUSTOMER')" class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="section-icon">📦</span>
+          <h2>My Activity</h2>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-chip">
+          <div class="stat-number">{{ totalOrders }}</div>
+          <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-number">₹{{ totalSpent }}</div>
+          <div class="stat-label">Total Spent</div>
+        </div>
+        <div class="stat-chip stat-chip--action" (click)="openOrdersModal()">
+          <div class="stat-number">🧾</div>
+          <div class="stat-label">Past Orders</div>
+        </div>
+      </div>
+
+      <div class="section-subhead">
+        <h3>Saved Addresses</h3>
+        <button class="btn btn--outline btn--sm" (click)="addAddress()">+ Add</button>
+      </div>
+
+      <div class="fields-grid">
+        <div *ngIf="addresses.length === 0" class="field-empty">No saved addresses yet.</div>
+        <div *ngFor="let addr of addresses; let i = index" class="address-row">
+          <span class="address-icon">📍</span>
+          <span class="address-text">{{ addr }}</span>
+          <button class="btn btn--danger-ghost btn--xs" (click)="deleteAddress(i)">Remove</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RESTAURANT SECTION ===== -->
+    <div *ngIf="isRole('RESTAURANT')" class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="section-icon">🍽️</span>
+          <h2>Restaurant Details</h2>
+        </div>
+        <button class="btn btn--outline btn--sm" (click)="isEditingRestaurant = !isEditingRestaurant">
+          {{ isEditingRestaurant ? 'Cancel' : 'Edit' }}
+        </button>
+      </div>
+
+      <!-- NO RESTAURANT FOUND -->
+      <div *ngIf="!restaurant && !isEditingRestaurant" class="field-empty">
+        No restaurant linked to your account yet. Contact support or try refreshing.
+      </div>
+
+      <!-- VIEW MODE -->
+      <div *ngIf="restaurant && !isEditingRestaurant">
+
+        <!-- Restaurant Image -->
+        <div *ngIf="restaurant.imageUrl" class="restaurant-image-wrap">
+          <img [src]="restaurant.imageUrl" alt="Restaurant" class="restaurant-img"
+               onerror="this.style.display='none'">
+        </div>
+
+        <div class="fields-grid">
+          <div class="field-row"><label class="field-label">Name</label><div class="field-value">{{ restaurant.name || '—' }}</div></div>
+          <div class="field-row"><label class="field-label">Cuisine</label><div class="field-value">{{ restaurant.cuisine || '—' }}</div></div>
+          <div class="field-row"><label class="field-label">Location</label><div class="field-value">{{ restaurant.location || '—' }}</div></div>
+          <div class="field-row field-row--full"><label class="field-label">Address</label><div class="field-value">{{ restaurant.address || '—' }}</div></div>
+
+          <div class="field-row"><label class="field-label">Phone</label><div class="field-value">{{ restaurant.phone || '—' }}</div></div>
+          <div class="field-row"><label class="field-label">Alt Phone</label><div class="field-value">{{ restaurant.altPhone || '—' }}</div></div>
+          <div class="field-row field-row--full"><label class="field-label">Email</label><div class="field-value">{{ restaurant.email || '—' }}</div></div>
+
+          <div class="field-row"><label class="field-label">Cost for Two</label><div class="field-value">₹{{ restaurant.costForTwo || 0 }}</div></div>
+          <div class="field-row"><label class="field-label">Rating</label><div class="field-value">⭐ {{ restaurant.rating || 'N/A' }}</div></div>
+          <div class="field-row"><label class="field-label">Opens</label><div class="field-value">{{ restaurant.openTime || '—' }}</div></div>
+          <div class="field-row"><label class="field-label">Closes</label><div class="field-value">{{ restaurant.closeTime || '—' }}</div></div>
+
+          <div class="field-row">
+            <label class="field-label">Status</label>
+            <div class="field-value">
+              <span class="badge" [class.badge--green]="restaurant.isOpen" [class.badge--red]="!restaurant.isOpen">
+                {{ restaurant.isOpen ? 'Open' : 'Closed' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label">Delivery</label>
+            <div class="field-value">
+              <span class="badge" [class.badge--green]="restaurant.deliveryAvailable" [class.badge--red]="!restaurant.deliveryAvailable">
+                {{ restaurant.deliveryAvailable ? 'Available' : 'Unavailable' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="field-row"><label class="field-label">GST No.</label><div class="field-value">{{ restaurant.gstNumber || '—' }}</div></div>
+          <div class="field-row"><label class="field-label">License No.</label><div class="field-value">{{ restaurant.licenseNumber || '—' }}</div></div>
+          <div class="field-row field-row--full">
+            <label class="field-label">Map Link</label>
+            <div class="field-value">
+              <a *ngIf="restaurant.mapLink" [href]="restaurant.mapLink" target="_blank" class="link">View on Map 🗺️</a>
+              <span *ngIf="!restaurant.mapLink">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT MODE -->
+      <div *ngIf="isEditingRestaurant" class="edit-form">
+
+        <div class="edit-image-section">
+          <label class="field-label">Restaurant Image</label>
+          <div class="edit-image-row">
+            <img *ngIf="restaurantForm.imageUrl" [src]="restaurantForm.imageUrl" class="edit-thumb"
+                 onerror="this.style.display='none'">
+            <label class="btn btn--outline btn--sm upload-label">
+              📷 Change Image
+              <input type="file" accept="image/*" (change)="onRestaurantImageSelected($event)" hidden>
+            </label>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+          <div class="field-row">
+            <label class="field-label">Name</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.name" placeholder="Restaurant name">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Cuisine</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.cuisine" placeholder="e.g. Indian, Chinese">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Location</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.location" placeholder="City / Area">
+          </div>
+          <div class="field-row field-row--full">
+            <label class="field-label">Address</label>
+            <textarea class="field-input field-textarea" [(ngModel)]="restaurantForm.address" placeholder="Full address" rows="2"></textarea>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label">Phone</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.phone" placeholder="10-digit phone" maxlength="10">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Alt Phone</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.altPhone" placeholder="Alternate phone" maxlength="10">
+          </div>
+          <div class="field-row field-row--full">
+            <label class="field-label">Email</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.email" placeholder="Restaurant email" type="email">
+          </div>
+
+          <div class="field-row">
+            <label class="field-label">Cost for Two (₹)</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.costForTwo" placeholder="e.g. 300" type="number">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Open Time</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.openTime" placeholder="e.g. 09:00 AM" type="time">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Close Time</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.closeTime" placeholder="e.g. 10:00 PM" type="time">
+          </div>
+
+          <div class="field-row">
+            <label class="field-label">Currently Open?</label>
+            <div class="toggle-row">
+              <label class="toggle">
+                <input type="checkbox" [(ngModel)]="restaurantForm.isOpen">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">{{ restaurantForm.isOpen ? 'Yes' : 'No' }}</span>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label">Delivery Available?</label>
+            <div class="toggle-row">
+              <label class="toggle">
+                <input type="checkbox" [(ngModel)]="restaurantForm.deliveryAvailable">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">{{ restaurantForm.deliveryAvailable ? 'Yes' : 'No' }}</span>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label">GST Number</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.gstNumber" placeholder="GST number">
+          </div>
+          <div class="field-row">
+            <label class="field-label">License Number</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.licenseNumber" placeholder="FSSAI / License no.">
+          </div>
+          <div class="field-row field-row--full">
+            <label class="field-label">Google Map Link</label>
+            <input class="field-input" [(ngModel)]="restaurantForm.mapLink" placeholder="https://maps.google.com/...">
+          </div>
+        </div>
+
+        <div class="section-actions">
+          <button class="btn btn--primary" (click)="updateRestaurantProfile()">Save Restaurant</button>
+          <button class="btn btn--ghost" (click)="isEditingRestaurant = false">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DELIVERY SECTION ===== -->
+    <div *ngIf="isRole('DELIVERY') || isRole('DELIVERY_PARTNER')" class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="section-icon">🛵</span>
+          <h2>Delivery Details</h2>
+        </div>
+        <button class="btn btn--outline btn--sm" (click)="isEditingDelivery = !isEditingDelivery">
+          {{ isEditingDelivery ? 'Cancel' : 'Edit' }}
+        </button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-chip">
+          <div class="stat-number">{{ completedDeliveries }}</div>
+          <div class="stat-label">Deliveries</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-number">₹{{ todayEarnings }}</div>
+          <div class="stat-label">Today's Earnings</div>
+        </div>
+      </div>
+
+      <div class="fields-grid">
+        <div class="field-row">
+          <label class="field-label">Vehicle Type</label>
+          <div *ngIf="!isEditingDelivery" class="field-value">{{ user?.vehicleType || '—' }}</div>
+          <input *ngIf="isEditingDelivery" class="field-input" [(ngModel)]="userForm['vehicleType']" [placeholder]="user?.vehicleType || 'e.g. Bike, Scooter'">
+        </div>
+        <div class="field-row">
+          <label class="field-label">Vehicle Number</label>
+          <div *ngIf="!isEditingDelivery" class="field-value">{{ user?.vehicleNumber || '—' }}</div>
+          <input *ngIf="isEditingDelivery" class="field-input" [(ngModel)]="userForm['vehicleNumber']" [placeholder]="user?.vehicleNumber || 'e.g. TN01AB1234'">
+        </div>
+      </div>
+
+      <div *ngIf="isEditingDelivery" class="section-actions">
+        <button class="btn btn--primary" (click)="updateCustomerProfile()">Save Changes</button>
+        <button class="btn btn--ghost" (click)="isEditingDelivery = false">Cancel</button>
+      </div>
+    </div>
+
+    <!-- ===== SECURITY SECTION ===== -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="section-icon">🔒</span>
+          <h2>Security</h2>
+        </div>
+        <button class="btn btn--outline btn--sm" (click)="showPasswordForm = !showPasswordForm">
+          {{ showPasswordForm ? 'Cancel' : 'Change Password' }}
+        </button>
+      </div>
+
+      <div *ngIf="!showPasswordForm" class="field-empty">
+        Click "Change Password" to update your credentials.
+      </div>
+
+      <div *ngIf="showPasswordForm" class="fields-grid">
+        <div class="field-row field-row--full">
+          <label class="field-label">Current Password</label>
+          <div class="password-input-wrap">
+            <input
+              [type]="showCurrentPassword ? 'text' : 'password'"
+              class="field-input"
+              [(ngModel)]="passwordForm.current"
+              placeholder="Enter current password"
+            >
+            <button type="button" class="eye-btn" (click)="showCurrentPassword = !showCurrentPassword">
+              {{ showCurrentPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="field-row field-row--full">
+          <label class="field-label">New Password</label>
+          <div class="password-input-wrap">
+            <input
+              [type]="showNewPassword ? 'text' : 'password'"
+              class="field-input"
+              [(ngModel)]="passwordForm.new"
+              placeholder="At least 6 characters"
+            >
+            <button type="button" class="eye-btn" (click)="showNewPassword = !showNewPassword">
+              {{ showNewPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="field-row field-row--full">
+          <label class="field-label">Confirm New Password</label>
+          <div class="password-input-wrap">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              class="field-input"
+              [(ngModel)]="passwordForm.confirm"
+              placeholder="Repeat new password"
+            >
+            <button type="button" class="eye-btn" (click)="showConfirmPassword = !showConfirmPassword">
+              {{ showConfirmPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="passwordForm.new && passwordForm.confirm && passwordForm.new !== passwordForm.confirm"
+             class="password-mismatch">
+          ⚠️ Passwords do not match
+        </div>
+
+        <div class="section-actions">
+          <button class="btn btn--primary" (click)="changePassword()">Update Password</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HELP SECTION (ALL ROLES) ===== -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="section-icon">🆘</span>
+          <h2>Help & Support</h2>
+        </div>
+        <button class="btn btn--outline btn--sm" (click)="showHelp ? closeHelp() : openHelp()">
+          {{ showHelp ? 'Close' : 'Open Help' }}
+        </button>
+      </div>
+
+      <div *ngIf="!showHelp" class="field-empty">
+        Click "Open Help" to browse FAQs or send us a message.
+      </div>
+
+      <div *ngIf="showHelp" class="help-body">
+
+        <!-- FAQ -->
+        <div class="help-faq-title">
+          <span>❓</span> Frequently Asked Questions
+        </div>
+
+        <div class="faq-list">
+          <div *ngFor="let faq of faqList; let i = index"
+               class="faq-item"
+               [class.faq-item--open]="activeFaqIndex === i">
+            <div class="faq-question" (click)="toggleFaq(i)">
+              <span>{{ faq.question }}</span>
+              <span class="faq-chevron">{{ activeFaqIndex === i ? '▲' : '▼' }}</span>
+            </div>
+            <div class="faq-answer" *ngIf="activeFaqIndex === i">
+              {{ faq.answer }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="help-contact-title">
+          <span>✉️</span> Contact Support
+        </div>
+
+        <div *ngIf="!helpSubmitted" class="fields-grid">
+          <div class="field-row">
+            <label class="field-label">Your Name *</label>
+            <input class="field-input" [(ngModel)]="helpForm.name" placeholder="Full name">
+          </div>
+          <div class="field-row">
+            <label class="field-label">Email *</label>
+            <input class="field-input" [(ngModel)]="helpForm.email" placeholder="your@email.com" type="email">
+          </div>
+          <div class="field-row field-row--full">
+            <label class="field-label">Subject</label>
+            <input class="field-input" [(ngModel)]="helpForm.subject" placeholder="e.g. Order issue, Payment problem...">
+          </div>
+          <div class="field-row field-row--full">
+            <label class="field-label">Message *</label>
+            <textarea class="field-input field-textarea" [(ngModel)]="helpForm.message"
+              placeholder="Describe your issue in detail. Include order ID if applicable."
+              rows="4"></textarea>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn--primary" (click)="submitHelp()">Send Message</button>
+          </div>
+        </div>
+
+        <div *ngIf="helpSubmitted" class="help-submitted">
+          <div class="help-submitted-icon">✓</div>
+          <h3>Message Sent!</h3>
+          <p>We'll get back to you at <strong>{{ helpForm.email }}</strong> within 24 hours.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end profile-body -->
+
+  <!-- ===== PAST ORDERS MODAL ===== -->
+  <div *ngIf="showOrdersModal" class="modal-backdrop" (click)="closeOrdersModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2>🧾 Past Orders</h2>
+        <button class="modal-close" (click)="closeOrdersModal()">✕</button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="ordersLoading" class="modal-loading">
+        <div class="spinner"></div>
+        <p>Loading your orders...</p>
+      </div>
+
+      <!-- No orders -->
+      <div *ngIf="!ordersLoading && pastOrders.length === 0" class="modal-empty">
+        <div class="modal-empty-icon">📭</div>
+        <p>No past orders found.</p>
+        <span>Your completed orders will appear here.</span>
+      </div>
+
+      <!-- Orders list -->
+      <div *ngIf="!ordersLoading && pastOrders.length > 0" class="orders-list">
+        <div *ngFor="let order of pastOrders"
+             class="order-card"
+             [class.order-card--selected]="selectedOrder?.id === order.id"
+             (click)="selectOrder(order)">
+
+          <div class="order-card-top">
+            <div class="order-left">
+              <div class="order-id">#{{ order.id || order.orderId }}</div>
+              <div class="order-restaurant">{{ order.restaurantName || order.restaurant?.name || 'Restaurant' }}</div>
+            </div>
+            <div class="order-right">
+              <span class="order-status" [ngClass]="getOrderStatusClass(order.status)">
+                {{ order.status || 'Delivered' }}
+              </span>
+              <div class="order-amount">₹{{ order.totalAmount || order.total || 0 }}</div>
+            </div>
+          </div>
+
+          <div class="order-date">
+            🕐 {{ order.createdAt ? (order.createdAt | date:'dd MMM yyyy, hh:mm a') : 'Date not available' }}
+          </div>
+
+          <!-- Expanded order detail -->
+          <div *ngIf="selectedOrder?.id === order.id" class="order-detail">
+            <div class="order-detail-title">Order Items</div>
+            <div *ngIf="order.items && order.items.length > 0">
+              <div *ngFor="let item of order.items" class="order-item-row">
+                <span class="order-item-name">{{ item.name || item.itemName }}</span>
+                <span class="order-item-qty">x{{ item.quantity || 1 }}</span>
+                <span class="order-item-price">₹{{ item.price || 0 }}</span>
+              </div>
+            </div>
+            <div *ngIf="!order.items || order.items.length === 0" class="order-no-items">
+              Item details not available.
+            </div>
+            <div class="order-detail-row">
+              <span>Delivery Address</span>
+              <span>{{ order.deliveryAddress || order.address || '—' }}</span>
+            </div>
+            <div class="order-detail-row order-detail-total">
+              <span>Total Paid</span>
+              <span>₹{{ order.totalAmount || order.total || 0 }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

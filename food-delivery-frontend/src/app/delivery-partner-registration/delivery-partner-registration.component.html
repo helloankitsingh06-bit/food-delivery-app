@@ -1,0 +1,95 @@
+<div class="partner-page">
+  <div class="form-card">
+    <h2>🚲 Become a Delivery Partner</h2>
+    <div class="subhead">Join our fleet • Start earning today</div>
+
+    <!-- SECTION 1: Personal Details -->
+    <div class="form-section">
+      <h3>👤 Personal Details</h3>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Full Name *</label>
+          <input type="text" placeholder="Enter your full name" [(ngModel)]="partner.fullName">
+        </div>
+        <div class="input-group">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="Phone Number" [(ngModel)]="partner.phoneNumber" readonly
+                 style="background: rgba(30,30,40,0.6); cursor: not-allowed;">
+          <small style="color: #4CAF50;">✓ Verified at login</small>
+        </div>
+        <div class="input-group">
+          <label>Email</label>
+          <input type="email" placeholder="Email" [(ngModel)]="partner.email" readonly
+                 style="background: rgba(30,30,40,0.6); cursor: not-allowed;">
+          <small style="color: #4CAF50;">✓ Verified at login</small>
+        </div>
+        <div class="input-group">
+          <label>City *</label>
+          <input type="text" placeholder="Enter your city" [(ngModel)]="partner.city">
+        </div>
+        <div class="input-group full-width">
+          <label>Full Address *</label>
+          <textarea placeholder="Enter your complete address with landmark" [(ngModel)]="partner.fullAddress" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Vehicle Details -->
+    <div class="form-section">
+      <h3>🚲 Cycle Details</h3>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Vehicle Type</label>
+          <select [(ngModel)]="partner.vehicleType">
+            <option value="Bike">🚲 Bicycle</option>
+            <option value="Electric">⚡ Electric Cycle</option>
+            <option value="Scooter">🛵 Scooter</option>
+            <option value="Car">🚗 Car</option>
+            <option value="Bike">🏍️ Bike</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Vehicle Number *</label>
+          <input type="text" placeholder="Enter vehicle number" [(ngModel)]="partner.vehicleNumber" 
+                 (input)="formatVehicleNumber()">
+        </div>
+        <div class="input-group full-width">
+          <label>Driving License Number *</label>
+          <input type="text" placeholder="Enter driving license number" [(ngModel)]="partner.drivingLicenseNumber">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Bank & KYC Details -->
+    <div class="form-section">
+      <h3>🏦 Bank & KYC Details</h3>
+      <div class="form-grid">
+        <div class="input-group full-width">
+          <label>Account Number (Optional)</label>
+          <input type="text" placeholder="Enter bank account number" [(ngModel)]="partner.bankAccountNumber">
+        </div>
+        <div class="input-group">
+          <label>IFSC Code (Optional)</label>
+          <input type="text" placeholder="Enter IFSC code" [(ngModel)]="partner.ifscCode" 
+                 (input)="formatIFSC()">
+        </div>
+        <div class="input-group">
+          <label>PAN Number (Optional)</label>
+          <input type="text" placeholder="Enter PAN number" [(ngModel)]="partner.panNumber" 
+                 (input)="formatPAN()">
+        </div>
+        <div class="input-group">
+          <label>Aadhaar Number *</label>   <!-- Label updated to Aadhaar -->
+          <input type="text" placeholder="Enter 12-digit Aadhaar number" [(ngModel)]="partner.aadhaarNumber" 
+                 (input)="formatAadhar()" maxlength="12">
+          <small style="color: #888;">Required for KYC verification</small>
+        </div>
+      </div>
+    </div>
+
+    <button class="submit-btn" (click)="registerPartner()" [disabled]="isLoading">
+      <span *ngIf="!isLoading">✨ Register Now</span>
+      <span *ngIf="isLoading">⏳ Submitting...</span>
+    </button>
+  </div>
+</div>

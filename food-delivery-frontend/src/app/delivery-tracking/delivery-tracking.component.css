@@ -1,0 +1,430 @@
+/* ================= GLOBAL ================= */
+.tracking-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, #0a0a0a, #000000);
+  padding: 40px 20px;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ================= BACK BUTTON ================= */
+
+.back-btn {
+  position: relative;
+  z-index: 5;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  color: #FFD700;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 25px;
+  transition: 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.back-btn:hover {
+  background: rgba(255, 215, 0, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.08);
+}
+
+/* Animated glow background */
+.bg-glow {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 60%);
+  z-index: 0;
+  animation: slowRotate 30s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes slowRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Main container */
+.tracking-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Header */
+.tracking-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.tracking-header h1 {
+  font-size: 48px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+
+.tracking-header p {
+  color: #aaa;
+  font-size: 14px;
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,215,0,0.15);
+  padding: 4px 16px;
+  border-radius: 40px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFD700;
+  margin-top: 12px;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #4caf50;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulseGreen 1.2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% { opacity: 0.4; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Grid layout */
+.tracking-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 1000px) {
+  .tracking-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* MAP CARD */
+.map-card {
+  background: rgba(20,20,30,0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 32px;
+  overflow: hidden;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+#tracking-map {
+  height: 420px;
+  width: 100%;
+  border-radius: 24px;
+  background: #1e1e2a;
+}
+
+.progress-container {
+  margin-top: 18px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #ddd;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  width: 0%;
+  transition: width 0.3s linear;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(255,215,0,0.5);
+}
+
+.live-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.live-stats i {
+  color: #FFD700;
+  margin-right: 5px;
+}
+
+/* Info stack cards (glass) */
+.glass-card {
+  background: rgba(20,20,30,0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 28px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: all 0.25s;
+}
+
+.glass-card:hover {
+  border-color: rgba(255,215,0,0.35);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* Rider card */
+.rider-card {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.rider-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #FFD700;
+  object-fit: cover;
+}
+
+.rider-details h3 {
+  margin: 0 0 4px;
+  color: #fff;
+}
+
+.rating {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.rating i {
+  color: #FFD700;
+}
+
+.badge {
+  background: rgba(255,215,0,0.2);
+  padding: 2px 8px;
+  border-radius: 40px;
+  font-size: 11px;
+  color: #FFD700;
+}
+
+.call-btn, .msg-btn {
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.4);
+  border-radius: 40px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-right: 8px;
+}
+
+.call-btn:hover, .msg-btn:hover {
+  background: #FFD700;
+  color: #111;
+  transform: translateY(-2px);
+}
+
+/* Timeline card */
+.timeline-card h3 {
+  color: #FFD700;
+  font-size: 18px;
+  margin-bottom: 18px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+}
+
+.timeline-icon {
+  width: 38px;
+  height: 38px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #aaa;
+  z-index: 2;
+}
+
+.timeline-icon.completed {
+  background: #FFD700;
+  border-color: #FFD700;
+  color: #111;
+  box-shadow: 0 0 12px rgba(255,215,0,0.5);
+}
+
+.timeline-content .label {
+  font-weight: 600;
+  color: #fff;
+}
+
+.timeline-content .time {
+  font-size: 12px;
+  color: #888;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 19px;
+  top: 40px;
+  width: 2px;
+  height: calc(100% - 20px);
+  background: rgba(255,215,0,0.2);
+}
+
+.timeline-line.active {
+  background: #FFD700;
+}
+
+/* ETA card */
+.eta-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.eta-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.eta-main i {
+  font-size: 36px;
+  color: #FFD700;
+}
+
+.eta-main span {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.eta-main h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #FFD700;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.share-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 60px;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: #ddd;
+  cursor: pointer;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-btn:hover {
+  background: rgba(255,215,0,0.15);
+  border-color: #FFD700;
+}
+
+/* Vehicle card */
+.vehicle-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.vehicle-card i {
+  font-size: 32px;
+  color: #FFD700;
+}
+
+.vehicle-card strong {
+  color: #fff;
+  font-weight: 500;
+}
+
+.live-dot {
+  margin-left: auto;
+  width: 10px;
+  height: 10px;
+  background: #4caf50;
+  border-radius: 50%;
+  animation: pulse 1.4s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Custom marker styles (Leaflet) */
+.custom-marker {
+  font-size: 26px;
+  text-align: center;
+  line-height: 30px;
+}
+
+.rider-marker {
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px #FFD700, 0 0 12px rgba(0,0,0,0.3);
+}
+
+/* Responsive touches */
+@media (max-width: 600px) {
+  .tracking-header h1 {
+    font-size: 32px;
+  }
+  .eta-main h2 {
+    font-size: 24px;
+  }
+  .rider-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}

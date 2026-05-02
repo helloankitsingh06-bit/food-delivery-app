@@ -1,0 +1,170 @@
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="menu-header">
+    <div class="header-left">
+      <button class="btn-outline" (click)="goBack()">← Back</button>
+    </div>
+    <div class="header-right">
+      <button class="btn-gold cart-button" (click)="toggleCart()" #cartBtn>
+        🛒 <span class="cart-count">{{ getCartItemCount() }}</span> | ₹{{ getCartTotal() }}
+      </button>
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div class="menu-title">
+    <h1>{{ restaurantName || 'Menu' }}</h1>
+    <p>Premium Food Experience</p>
+  </div>
+
+  <!-- SEARCH & SORT -->
+  <div class="search-sort-bar">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search for dishes..." [(ngModel)]="searchText"
+             (input)="onSearchOrSortChange()" class="search-input" />
+      <button *ngIf="searchText" class="clear-search" (click)="searchText=''; onSearchOrSortChange()">✖</button>
+    </div>
+    <div class="sort-wrapper">
+      <label>Sort by:</label>
+      <select [(ngModel)]="sortOption" (change)="onSearchOrSortChange()" class="sort-select">
+        <option value="default">Default</option>
+        <option value="priceLowHigh">Price: Low → High</option>
+        <option value="priceHighLow">Price: High → Low</option>
+        <option value="nameAZ">Name: A → Z</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- MENU GRID -->
+  <div class="grid" *ngIf="!loading && filteredMenuItems?.length > 0; else emptyOrLoading">
+    <ng-container *ngFor="let item of filteredMenuItems">
+      <div class="card">
+        <div class="item-image-container">
+          <img *ngIf="item.imageUrl" [src]="'http://localhost:8080/images/' + item.imageUrl"
+               class="item-image" (error)="item.imageUrl = null" />
+          <div *ngIf="!item.imageUrl" class="no-image-placeholder">🍽️</div>
+        </div>
+        <div class="card-content">
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.description || 'Delicious food item' }}</p>
+          <div class="card-bottom">
+            <span class="price">₹{{ item.price }}</span>
+            <button class="btn-gold" [disabled]="!item.available"
+                    (click)="animateAddToCart($event, item)">
+              {{ item.available ? 'Add to Cart' : 'Unavailable' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- EMPTY / LOADING -->
+  <ng-template #emptyOrLoading>
+    <div class="empty-state" *ngIf="!loading; else loadingSpinner">
+      <div class="empty-icon">🍽️</div>
+      <p *ngIf="menuItems.length === 0">Menu items will be shown here</p>
+      <p *ngIf="menuItems.length > 0 && filteredMenuItems.length === 0">
+        No items match "{{ searchText }}"
+      </p>
+    </div>
+    <ng-template #loadingSpinner>
+      <div class="loading-spinner">Loading premium menu...</div>
+    </ng-template>
+  </ng-template>
+
+  <!-- RECOMMENDED SECTION (only if items exist) -->
+  <div class="recommended-section" *ngIf="recommendedItems.length > 0 && !loading">
+    <div class="recommended-header">
+      <h2>🔥 You might also love</h2>
+      <div class="gold-line"></div>
+    </div>
+    <div class="recommended-grid">
+      <div *ngFor="let item of recommendedItems" class="rec-card">
+        <div class="rec-image">
+          <img *ngIf="item.imageUrl" [src]="'http://localhost:8080/images/' + item.imageUrl"
+               onerror="this.src='https://via.placeholder.com/120?text=Food'">
+          <div *ngIf="!item.imageUrl" class="rec-no-image">🍴</div>
+        </div>
+        <div class="rec-info">
+          <h4>{{ item.name }}</h4>
+          <p>₹{{ item.price }}</p>
+          <button class="btn-small-gold" (click)="animateAddToCart($event, item)">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CART SIDEBAR (premium version) -->
+  <div class="cart" [class.open]="showCart">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button class="close-cart" (click)="toggleCart()">✕</button>
+    </div>
+
+    <div class="cart-items-list" *ngIf="cart.length > 0; else emptyCart">
+      <div *ngFor="let item of cart" class="cart-item-premium">
+        <div class="cart-item-image">
+          <img *ngIf="item.imageUrl" [src]="'http://localhost:8080/images/' + item.imageUrl"
+               onerror="this.src='https://via.placeholder.com/60?text=Food'">
+          <div *ngIf="!item.imageUrl" class="cart-no-image">🍽️</div>
+        </div>
+        <div class="cart-item-details">
+          <div class="cart-item-name">{{ item.name }}</div>
+          <div class="cart-item-price">₹{{ item.price }}</div>
+          <div class="cart-item-subtotal">Subtotal: ₹{{ item.price * item.quantity }}</div>
+        </div>
+        <div class="cart-item-actions-premium">
+          <button class="qty-btn" (click)="removeFromCart(item)">−</button>
+          <span class="qty">{{ item.quantity }}</span>
+          <button class="qty-btn" (click)="addToCart(item)">+</button>
+          <button class="remove-btn" (click)="removeItemCompletely(item)" title="Remove item">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #emptyCart>
+      <div class="empty-cart-premium">
+        <div class="empty-cart-icon">🛒</div>
+        <p>Your cart is empty</p>
+        <p class="empty-sub">Add some delicious items from the menu</p>
+      </div>
+    </ng-template>
+
+    <div class="coupon-section" *ngIf="cart.length > 0">
+      <div class="coupon-input-group">
+        <input type="text" placeholder="Coupon code" [(ngModel)]="couponCode" class="coupon-input">
+        <button class="apply-coupon" (click)="applyCoupon()">Apply</button>
+      </div>
+      <div *ngIf="discountAmount > 0" class="discount-row">
+        <span>Discount ({{ couponCode }})</span>
+        <span>- ₹{{ discountAmount }}</span>
+      </div>
+    </div>
+
+    <div class="cart-footer-premium">
+      <div class="total-row">
+        <span>Subtotal</span>
+        <span>₹{{ getCartTotal() }}</span>
+      </div>
+      <div class="total-row" *ngIf="deliveryFee > 0">
+        <span>Delivery fee</span>
+        <span>₹{{ deliveryFee }}</span>
+      </div>
+      <div class="total-row grand-total">
+        <span>Total</span>
+        <span>₹{{ getFinalTotal() }}</span>
+      </div>
+      <div class="delivery-info" *ngIf="getCartTotal() < freeDeliveryThreshold">
+        <span>🚚 Add ₹{{ freeDeliveryThreshold - getCartTotal() }} more for free delivery</span>
+      </div>
+      <div class="delivery-info" *ngIf="getCartTotal() >= freeDeliveryThreshold">
+        <span>🎉 Free delivery applied!</span>
+      </div>
+      <button class="btn-gold place-order-btn" (click)="placeOrder()">Place Order →</button>
+    </div>
+  </div>
+
+</div>

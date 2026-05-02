@@ -1,0 +1,89 @@
+<div class="thank-you-page">
+
+  <!-- Animated background glows -->
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <!-- Main Card -->
+  <div class="thank-you-card">
+
+    <!-- Success Icon with confetti trigger -->
+    <div class="success-icon">
+      <i class="fas fa-check"></i>
+      <div class="ripple"></div>
+    </div>
+
+    <!-- Heading -->
+    <h1>🎉 Order Confirmed!</h1>
+    <p class="subtitle">
+      Thank you for ordering with us.<br>
+      Your delicious meal is being prepared with love.
+    </p>
+
+    <!-- Order ID + Live Clock -->
+    <div class="order-meta">
+      <span class="order-id">Order #{{ orderDetails.orderId }}</span>
+      <span class="live-clock"><i class="far fa-clock"></i> {{ currentTime }}</span>
+    </div>
+
+    <!-- Progress Timeline -->
+    <div class="timeline">
+      <div *ngFor="let step of timelineSteps; let i = index" class="timeline-step" [class.completed]="step.completed">
+        <div class="step-icon">
+          <i [class]="'fas ' + step.icon"></i>
+        </div>
+        <div class="step-info">
+          <span class="step-label">{{ step.label }}</span>
+          <span class="step-time">{{ step.time }}</span>
+        </div>
+        <div *ngIf="i < timelineSteps.length - 1" class="step-line" [class.active]="step.completed"></div>
+      </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="countdown-box">
+      <i class="fas fa-hourglass-half"></i>
+      <span>Estimated delivery in</span>
+      <strong>{{ minutesLeft }}:{{ secondsLeft < 10 ? '0' + secondsLeft : secondsLeft }}</strong>
+    </div>
+
+    <!-- Order Summary (items) -->
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <div class="item-list">
+        <div *ngFor="let item of orderDetails.items" class="summary-item">
+          <span>{{ item.name }} x {{ item.quantity }}</span>
+          <span>₹{{ item.price * item.quantity }}</span>
+        </div>
+      </div>
+      <div class="summary-total">
+        <span>Total</span>
+        <span>₹{{ orderDetails.total }}</span>
+      </div>
+      <div class="delivery-address">
+        <i class="fas fa-map-marker-alt"></i> {{ orderDetails.deliveryAddress || 'Home - Main Street' }}
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="track-btn" (click)="goToTracking()">
+        <i class="fas fa-map-marked-alt"></i> Track Your Order
+      </button>
+      <button class="secondary-btn" (click)="shareOrder()">
+        <i class="fas fa-share-alt"></i> Share
+      </button>
+      <button class="secondary-btn" (click)="downloadInvoice()">
+        <i class="fas fa-download"></i> Invoice
+      </button>
+      <button class="secondary-btn" (click)="addToCalendar()">
+        <i class="far fa-calendar-alt"></i> Add to Calendar
+      </button>
+    </div>
+
+    <!-- Footer message -->
+    <div class="footer-message">
+      <i class="fas fa-smile-wink"></i> Need help? Contact support
+    </div>
+  </div>
+</div>

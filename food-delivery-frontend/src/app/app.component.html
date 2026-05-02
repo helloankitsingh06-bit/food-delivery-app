@@ -1,0 +1,12 @@
+<!-- 🔥 NAVBAR (ONLY WHEN ALLOWED) -->
+<nav *ngIf="showNavbar" class="navbar">
+
+  <!-- 🔥 FUTURE READY (OPTIONAL LINKS) -->
+  <div class="nav-links" *ngIf="!isLoggedIn">
+    <!-- removed login/register buttons -->
+  </div>
+
+</nav>
+
+<!-- 🔥 ROUTES -->
+<router-outlet></router-outlet>

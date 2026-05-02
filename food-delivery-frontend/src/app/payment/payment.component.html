@@ -1,0 +1,174 @@
+<div class="payment-page">
+  <div class="premium-container">
+
+    <!-- HEADER -->
+    <div class="payment-header">
+      <h1>✨ Secure Checkout</h1>
+      <p>Review your order and complete payment</p>
+    </div>
+
+    <div class="two-column-layout">
+      <!-- LEFT COLUMN: Order Summary -->
+      <div class="order-summary">
+        <div class="glass-card">
+          <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+          
+          <!-- Items with thumbnails -->
+          <div class="cart-items-list">
+            <div *ngFor="let item of cartItems" class="cart-item-premium">
+              <div class="item-image">
+                <img [src]="getItemImage(item)" onerror="this.src='https://via.placeholder.com/60?text=Food'">
+              </div>
+              <div class="item-details">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-price">₹{{ item.price }} x {{ item.quantity }}</div>
+              </div>
+              <div class="item-subtotal">₹{{ getItemSubtotal(item) }}</div>
+            </div>
+          </div>
+
+          <!-- Bill Breakdown -->
+          <div class="bill-breakdown">
+            <div class="break-row">
+              <span>Subtotal</span>
+              <span>₹{{ subtotal }}</span>
+            </div>
+            <div class="break-row">
+              <span>Tax (10%)</span>
+              <span>₹{{ tax }}</span>
+            </div>
+            <div class="break-row">
+              <span>Delivery Fee</span>
+              <span>₹{{ deliveryFee }}</span>
+            </div>
+            <div class="break-row" *ngIf="tipAmount > 0">
+              <span>Tip</span>
+              <span>₹{{ tipAmount }}</span>
+            </div>
+            <div class="break-row discount" *ngIf="discount > 0">
+              <span>Discount</span>
+              <span>- ₹{{ discount }}</span>
+            </div>
+            <div class="break-row grand-total">
+              <span>Total</span>
+              <span>₹{{ totalPrice }}</span>
+            </div>
+          </div>
+
+          <!-- Delivery Address with edit -->
+          <div class="address-section">
+            <div class="section-title">
+              <i class="fas fa-map-marker-alt"></i> Delivery Address
+              <button class="edit-address-btn" (click)="showAddressEditor = !showAddressEditor">
+                <i class="fas fa-pen"></i> Edit
+              </button>
+            </div>
+            <div *ngIf="!showAddressEditor" class="address-display">
+              {{ deliveryAddress }}
+            </div>
+            <div *ngIf="showAddressEditor" class="address-editor">
+              <input type="text" [(ngModel)]="tempAddress" class="address-input">
+              <button class="save-address-btn" (click)="saveAddress()">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Payment & Extras -->
+      <div class="payment-extras">
+        
+        <!-- Promo Code -->
+        <div class="glass-card">
+          <h2><i class="fas fa-tag"></i> Promo Code</h2>
+          <div class="promo-input-group">
+            <input type="text" [(ngModel)]="promoCode" placeholder="Enter code" class="promo-input">
+            <button class="apply-promo" (click)="applyPromoCode()" *ngIf="!promoApplied">Apply</button>
+            <button class="remove-promo" (click)="removePromo()" *ngIf="promoApplied">Remove</button>
+          </div>
+          <div *ngIf="promoMessage" class="promo-message">{{ promoMessage }}</div>
+          <div *ngIf="promoApplied" class="applied-badge">✓ PREMIUM10 applied</div>
+        </div>
+
+        <!-- Tip Section -->
+        <div class="glass-card">
+          <h2><i class="fas fa-heart"></i> Support your delivery partner</h2>
+          <div class="tip-options">
+            <button class="tip-btn" [class.active]="selectedTip === 0" (click)="setTip(0)">No tip</button>
+            <button class="tip-btn" [class.active]="selectedTip === 1" (click)="setTip(1)">10%</button>
+            <button class="tip-btn" [class.active]="selectedTip === 2" (click)="setTip(2)">15%</button>
+            <button class="tip-btn" [class.active]="selectedTip === 3" (click)="setTip(3)">20%</button>
+            <button class="tip-btn" [class.active]="selectedTip === 4" (click)="setTip(4)">Custom</button>
+          </div>
+          <div *ngIf="selectedTip === 4" class="custom-tip">
+            <input type="number" [(ngModel)]="customTip" (input)="updateCustomTip()" placeholder="Enter amount" class="tip-input">
+          </div>
+        </div>
+
+        <!-- Loyalty Points -->
+        <div class="glass-card" *ngIf="loyaltyPoints > 0">
+          <h2><i class="fas fa-coins"></i> Loyalty Points</h2>
+          <div class="loyalty-row">
+            <span>You have <strong>{{ loyaltyPoints }}</strong> points (₹{{ loyaltyPoints * 0.5 }} value)</span>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="useLoyalty" (change)="toggleLoyalty()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div *ngIf="useLoyalty && loyaltyDiscount > 0" class="loyalty-discount">
+            Using {{ loyaltyDiscount / 0.5 }} points → -₹{{ loyaltyDiscount }}
+          </div>
+        </div>
+
+        <!-- Payment Method Cards -->
+        <div class="glass-card">
+          <h2><i class="fas fa-credit-card"></i> Payment Method</h2>
+          <div class="payment-methods">
+            <div class="payment-option" [class.selected]="selectedPaymentMethod === 'COD'" (click)="selectedPaymentMethod='COD'">
+              <i class="fas fa-money-bill-wave"></i>
+              <span>Cash on Delivery</span>
+              <i class="fas fa-check-circle check-icon" *ngIf="selectedPaymentMethod === 'COD'"></i>
+            </div>
+            <div class="payment-option" [class.selected]="selectedPaymentMethod === 'UPI'" (click)="selectedPaymentMethod='UPI'">
+              <i class="fas fa-mobile-alt"></i>
+              <span>UPI Payment</span>
+              <i class="fas fa-check-circle check-icon" *ngIf="selectedPaymentMethod === 'UPI'"></i>
+            </div>
+            <div class="payment-option" [class.selected]="selectedPaymentMethod === 'CARD'" (click)="selectedPaymentMethod='CARD'">
+              <i class="fas fa-credit-card"></i>
+              <span>Credit / Debit Card</span>
+              <i class="fas fa-check-circle check-icon" *ngIf="selectedPaymentMethod === 'CARD'"></i>
+            </div>
+          </div>
+
+          <!-- UPI Apps (if UPI selected) -->
+          <div *ngIf="selectedPaymentMethod === 'UPI'" class="upi-apps">
+            <div class="upi-option" [class.selected]="selectedUPI === 'GPay'" (click)="selectedUPI='GPay'">
+              <img src="https://cdn-icons-png.flaticon.com/512/6125/6125011.png" alt="GPay"> Google Pay
+            </div>
+            <div class="upi-option" [class.selected]="selectedUPI === 'PhonePe'" (click)="selectedUPI='PhonePe'">
+              <img src="https://cdn-icons-png.flaticon.com/512/6125/6125014.png" alt="PhonePe"> PhonePe
+            </div>
+            <div class="upi-option" [class.selected]="selectedUPI === 'Paytm'" (click)="selectedUPI='Paytm'">
+              <img src="https://cdn-icons-png.flaticon.com/512/6125/6125016.png" alt="Paytm"> Paytm
+            </div>
+          </div>
+
+          <!-- Card placeholder (simulated) -->
+          <div *ngIf="selectedPaymentMethod === 'CARD'" class="card-details">
+            <input type="text" placeholder="Card Number" class="card-input">
+            <div class="card-row">
+              <input type="text" placeholder="MM/YY" class="card-input small">
+              <input type="text" placeholder="CVC" class="card-input small">
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Button -->
+        <button class="confirm-btn" (click)="placeFinalOrder()" [disabled]="loading">
+          <span *ngIf="!loading">Confirm Order & Pay ₹{{ totalPrice }}</span>
+          <span *ngIf="loading"><i class="fas fa-spinner fa-pulse"></i> Processing...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
